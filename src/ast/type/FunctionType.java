@@ -4,12 +4,13 @@ import ast.ASTAbstractNode;
 import ast.program.VarDefinition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FunctionType extends ASTAbstractNode implements Type {
-    public ArrayList<VarDefinition> definitions;
+    public List<VarDefinition> definitions;
     public Type returnType;
 
-    public FunctionType(int line, int column, ArrayList<VarDefinition> definitions, Type returnType) {
+    public FunctionType(int line, int column, List<VarDefinition> definitions, Type returnType) {
         super(line, column);
         this.definitions = definitions;
         this.returnType = returnType;

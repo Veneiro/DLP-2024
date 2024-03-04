@@ -8,6 +8,8 @@ grammar Cmm;
     import ast.type.*;
 }
 
+// --- PARSER ---
+
 program returns [Program ast]: d=definitions { $ast = new Program(0,0,$d.ast); }
     ;
 
@@ -37,31 +39,73 @@ expression returns [Expression ast]:
         | ID'(' es=expressions ')' {$ast = new FuncInvocation($ID.getLine(), $ID.getCharPositionInLine()+1, new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text), $es.ast);}
        ;
 
-expressions returns [List<Expression> ast = new ArrayList<>()]: ((e1=expression { $ast.add($e1.ast); } ',')* e2=expression { $ast.add($e2.ast); } )?
+expressions returns [List<Expression> ast = new ArrayList<>()]:
+        ((e1=expression { $ast.add($e1.ast); } ',')*
+        e2=expression { $ast.add($e2.ast); } )?
         ;
 
-statement: 'read' ((expression ',')* expression)? ';'
-         | 'write' ((expression ',')* expression)? ';'
-         | expression '=' expression';'
-         | ID'(' ((expression ',')* expression)? ')' ';'
-         | 'if' '(' expression ')' block ('else' block)?
-         | 'while' '(' expression ')' block
-         | 'return' expression ';'
+statement returns [Statement ast]:
+           r='read' ((e1=expression ',')* e1=expression)? ';'
+           {$ast = new Read($r.getLine(), $r.getCharPositionInLine()+1, $e1.ast);}
+         | w='write' es=expressions ';'
+           {$ast = new Write($w.getLine(), $w.getCharPositionInLine()+1, $es.ast);}
+         | assignTo=expression '=' toAssign=expression';'
+           {$ast = new Assignment($assignTo.ast.getLine(), $assignTo.ast.getColumn(), $assignTo.ast, $toAssign.ast);}
+         | ID'(' es=expressions ')' ';'
+           {
+            $ast = new FunctionInvocation(
+               $ID.getLine(),
+               $ID.getCharPositionInLine() + 1,
+               $es.ast
+           );}
+         | {List<Statement> elseStatements = new ArrayList<>();}
+         i='if' '(' exp=expression ')' ifStmts=block ('else' elseStmts=block {elseStatements = $elseStmts.ast;})?
+          {$ast = new IfElse(
+              $i.getLine(),
+              $i.getCharPositionInLine() + 1,
+              $ifStmts.ast,
+              elseStatements,
+              $exp.ast
+           );}
+         | wh='while' '(' e1=expression ')' wB=block
+         {$ast = new While(
+             $wh.getLine(),
+             $wh.getCharPositionInLine() + 1,
+             $wB.ast,
+             $e1.ast
+         );}
+         | 'return' e1=expression ';'
+         {$ast = new Return($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast);}
         ;
 
-block: statement | '{' statement* '}'
+block returns [List<Statement> ast = new ArrayList<>()]:
+    st1=statement {$ast.add($st1.ast);}
+    | '{' (st2=statement {$ast.add($st2.ast);} )* '}'
     ;
 
 type returns [Type ast]:
-    t='int' { $ast = new IntType($t.getLine(), $t.getCharPositionInLine()+1);}
-    | 'double' {$ast = new DoubleType();}
-    | 'char' {$ast = new CharType();}
-    | t=type '[' INT_CONSTANT ']' {$ast = new ArrayType($t.ast.getLine(), $t.ast.getColumn(), $INT_CONSTANT.int, $t.ast);}
+    builtInType {$ast = $builtInType.ast;}
+    | t2=type '[' INT_CONSTANT ']' {$ast = new ArrayType($t2.ast.getLine(), $t2.ast.getColumn(), $INT_CONSTANT.int, $t2.ast);}
     | s=struct {$ast = $s.ast;}
     ;
 
-definitions returns [List<Definition> ast = new ArrayList<>()]: (d1=varDef { $ast.addAll($d1.ast); } | d2=funcDef { $ast.add($d2.ast); })* d3=mainFuncDef { $ast.add($d3.ast); }
-           ;
+builtInType returns [Type ast]:
+    t1='int' { $ast = new IntType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+    | t1='double' {$ast = new DoubleType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+    | t1='char' {$ast = new CharType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+    ;
+
+definitions returns [List<Definition> ast = new ArrayList<>()]:
+    (d1=varDef { $ast.addAll($d1.ast); }
+    | d2=funcDef { $ast.add($d2.ast); })*
+    d3=mainFuncDef { $ast.add($d3.ast); }
+    ;
+
+mainFuncDef returns [FuncDefinition ast]: 'void' main='main' '(' ')' '{' body '}'
+    {
+       $ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main");
+    }
+    ;
 
 varDef returns [List<VarDefinition> ast = new ArrayList<>()]: t=type i=ids ';'
         {
@@ -71,61 +115,109 @@ varDef returns [List<VarDefinition> ast = new ArrayList<>()]: t=type i=ids ';'
         }
       ;
 
-ids returns [List<String> ast = new ArrayList<>()]: (i1=ID { $ast.add($i1.text); }  ',')* i2=ID { $ast.add($i2.text); }
+ids returns [List<String> ast = new ArrayList<>()]:
+    (i1=ID { $ast.add($i1.text); }  ',')* i2=ID { $ast.add($i2.text); }
     ;
 
-funcDef returns [FuncDefinition ast]: type ID '(' params ')' '{' body '}'
+funcDef returns [FuncDefinition ast] locals [List<Statement> statements = new ArrayList<>()]:
+        (builtInType | 'void') ID '(' params ')' '{' body '}'
+        {FuncDefinition funcDef = new FuncDefinition(
+                                        $ID.getLine(),
+                                        $ID.getCharPositionInLine() + 1,
+                                        $statements,
+                                        $ID.text
+                                    );
+        $ast = funcDef;};
+
+params returns [List<VarDefinition> ast = new ArrayList<>()]:
+        ((parameter {$ast.add($parameter.ast);} ',')*
+        parameter {$ast.add($parameter.ast);})?
        ;
 
-params: ((parameter ',')* parameter)?
-       ;
-
-mainFuncDef returns [FuncDefinition ast]: 'void' 'main' '(' ')' '{' body '}'
-           ;
-
-parameter: type ID
+parameter returns [VarDefinition ast]: builtInType ID
+         {$ast = new VarDefinition(
+             $ID.getLine(),
+             $ID.getCharPositionInLine() + 1,
+             $ID.text,
+             $builtInType.ast
+         );}
          ;
 
-body: varDef* statement*
-    ;
+body returns [List<Statement> ast = new ArrayList<>()]:
+        (varDef {$ast.addAll($varDef.ast);} )*
+        | st1=statement {$ast.add($st1.ast);}
+        | '{' (st2=statement {$ast.add($st2.ast);} )* '}'
+        ;
 
-struct returns [StructType ast]: 'struct' '{' record '}' { $ast = new StructType()}
+struct returns [StructType ast]:
+     s='struct' '{' r=record '}'
+     { $ast = new StructType($s.getLine(), $s.getCharPositionInLine()+1, $r.ast);}
      ;
 
 record returns [List<Field> ast = new ArrayList<>()]: varDef*
       ;
 
+
+// --- LEXER ---
+
+/**
+* Digits
+*/
 fragment
 DIGIT: [0-9]
      ;
 
+/**
+* Integer Constants
+*/
 INT_CONSTANT: '0'
             | [1-9] DIGIT*
             ;
 
+/**
+* Real Constants
+*/
 REAL_CONSTANT: INT_CONSTANT '.' [0-9]*?
              | INT_CONSTANT? '.' [0-9]+
              ;
 
+/**
+* Real Constants but with exponents
+*/
 REAL_CONSTANT_WITH_EXPONENT: REAL_CONSTANT
                           | REAL_CONSTANT ('e'| 'E') ('+' | '-')? INT_CONSTANT
                           ;
 
+/**
+* Character constant
+*/
 CHAR_CONSTANT: '\'' . '\''
              | '\'' '\\' [0-9]+ '\''
              | '\'' '\\t' '\''
              | '\'' '\\n' '\''
              ;
 
+/**
+* Single line comment to skip
+*/
 ON_LINE_COMMENT: '//' .*? ('\n' | '\r' | '\n\r' | '\r\n' | EOF) -> skip
                ;
 
+/**
+* Multiline comment to skip
+*/
 MULTI_LINE_COMMENT: '/*' .*? '*/' -> skip
                   ;
 
+/**
+* ID
+*/
 ID: ([a-zA-Z] | '_')
     | ([a-zA-Z] | [0-9] | '_')+
   ;
 
+/**
+* White spaces to skip
+*/
 WHITE_SPACES: (' ' | '\t' | '\n' | '\r') -> skip
             ;

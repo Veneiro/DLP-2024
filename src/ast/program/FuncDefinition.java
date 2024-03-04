@@ -4,16 +4,17 @@ import ast.ASTAbstractNode;
 import ast.statement.Statement;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FuncDefinition extends ASTAbstractNode implements Definition {
-    public ArrayList<Statement> statements;
+    public List<Statement> statements;
     private String name;
     @Override
     public String getName() {
         return name;
     }
 
-    public FuncDefinition(int line, int column, ArrayList<Statement> statements, String name) {
+    public FuncDefinition(int line, int column, List<Statement> statements, String name) {
         super(line, column);
         this.statements = statements;
         this.name = name;

@@ -13,6 +13,12 @@ grammar Cmm;
 program returns [Program ast]: d=definitions { $ast = new Program(0,0,$d.ast); }
     ;
 
+definitions returns [List<Definition> ast = new ArrayList<>()]:
+    (d1=varDef { $ast.addAll($d1.ast); }
+    | d2=funcDef { $ast.add($d2.ast); })*
+    d3=main_func_def { $ast.add($d3.ast); }
+    ;
+
 expression returns [Expression ast]:
           ID { $ast = new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text); }
         | RC = REAL_CONSTANT {$ast = new RealLiteral($ID.getLine(), $ID.getCharPositionInLine()+1, LexerHelper.lexemeToReal($RC.text));}
@@ -21,22 +27,23 @@ expression returns [Expression ast]:
         | '(' e1=expression ')' {$ast = $e1.ast;}
         | e1=expression '[' e2=expression ']' {$ast = new Indexing($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast, $e2.ast);}
         | e1=expression '.' ID {$ast = new FieldAccess($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text, $e1.ast);}
-        | '(' t=type ')' e=expression {$ast = new Cast($e.ast.getLine(), $e.ast.getColumn(), $t.ast, $e.ast);}
+        | '(' t=built_in_type ')' e=expression {$ast = new Cast($e.ast.getLine(), $e.ast.getColumn(), $t.ast, $e.ast);}
         | '-' e1=expression {$ast = new UnaryMinus($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast);}
         | '!' e1=expression {$ast = new UnaryNot($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast);}
-        | e1=expression ('*' | '/' | '%') e2=expression
-            { $ast = new Arithmetic($e1.ast.getLine(), $e1.ast.getColumn(),
+        | e1=expression OP=('*' | '/' | '%') e2=expression //REVISAR
+            { $ast = Arithmetic.arithmeticFactory($e1.ast.getLine(), $e1.ast.getColumn(),
                 $e1.ast, $OP.text, $e2.ast); }
         | e1=expression OP=('+' | '-') e2=expression
             { $ast = new Arithmetic($e1.ast.getLine(), $e1.ast.getColumn(),
                 $e1.ast, $OP.text, $e2.ast); }
-        | e1=expression ('<' | '>' | '<=' | '>=' | '==' | '!=') e2=expression
+        | e1=expression OP=('<' | '>' | '<=' | '>=' | '==' | '!=') e2=expression
             { $ast = new Logical($e1.ast.getLine(), $e1.ast.getColumn(),
                 $e1.ast, $OP.text, $e2.ast); }
-        | e1=expression ('&&' | '||') e2=expression
+        | e1=expression OP=('&&' | '||') e2=expression
             { $ast = new Logical($e1.ast.getLine(), $e1.ast.getColumn(),
                 $e1.ast, $OP.text, $e2.ast); }
-        | ID'(' es=expressions ')' {$ast = new FuncInvocation($ID.getLine(), $ID.getCharPositionInLine()+1, new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text), $es.ast);}
+        | ID'(' es=expressions ')'
+            {$ast = new FuncInvocation($ID.getLine(), $ID.getCharPositionInLine()+1, new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text), $es.ast);}
        ;
 
 expressions returns [List<Expression> ast = new ArrayList<>()]:
@@ -79,32 +86,33 @@ statement returns [Statement ast]:
         ;
 
 block returns [List<Statement> ast = new ArrayList<>()]:
-    st1=statement {$ast.add($st1.ast);}
-    | '{' (st2=statement {$ast.add($st2.ast);} )* '}'
+    st1=statement
+        {$ast.add($st1.ast);}
+    | '{' (st2=statement
+        {$ast.add($st2.ast);} )* '}'
     ;
 
 type returns [Type ast]:
-    builtInType {$ast = $builtInType.ast;}
-    | t2=type '[' INT_CONSTANT ']' {$ast = new ArrayType($t2.ast.getLine(), $t2.ast.getColumn(), $INT_CONSTANT.int, $t2.ast);}
-    | s=struct {$ast = $s.ast;}
+    built_in_type
+        {$ast = $built_in_type.ast;}
+    | t2=type '[' INT_CONSTANT ']'
+        {$ast = new ArrayType($t2.ast.getLine(), $t2.ast.getColumn(), $INT_CONSTANT.int, $t2.ast);} //LexemeHelper para el int?
+    | s=struct
+        {$ast = $s.ast;}
     ;
 
-builtInType returns [Type ast]:
-    t1='int' { $ast = new IntType($t1.getLine(), $t1.getCharPositionInLine()+1);}
-    | t1='double' {$ast = new DoubleType($t1.getLine(), $t1.getCharPositionInLine()+1);}
-    | t1='char' {$ast = new CharType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+built_in_type returns [Type ast]:
+    t1='int'
+        { $ast = new IntType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+    | t1='double'
+        {$ast = new DoubleType($t1.getLine(), $t1.getCharPositionInLine()+1);}
+    | t1='char'
+        {$ast = new CharType($t1.getLine(), $t1.getCharPositionInLine()+1);}
     ;
 
-definitions returns [List<Definition> ast = new ArrayList<>()]:
-    (d1=varDef { $ast.addAll($d1.ast); }
-    | d2=funcDef { $ast.add($d2.ast); })*
-    d3=mainFuncDef { $ast.add($d3.ast); }
-    ;
-
-mainFuncDef returns [FuncDefinition ast]: 'void' main='main' '(' ')' '{' body '}'
-    {
-       $ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main");
-    }
+main_func_def returns [FuncDefinition ast]:
+    'void' main='main' '(' ')' '{' body '}' EOF
+        {$ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main");}
     ;
 
 varDef returns [List<VarDefinition> ast = new ArrayList<>()]: t=type i=ids ';'
@@ -119,27 +127,25 @@ ids returns [List<String> ast = new ArrayList<>()]:
     (i1=ID { $ast.add($i1.text); }  ',')* i2=ID { $ast.add($i2.text); }
     ;
 
-funcDef returns [FuncDefinition ast] locals [List<Statement> statements = new ArrayList<>()]:
-        (builtInType | 'void') ID '(' params ')' '{' body '}'
-        {FuncDefinition funcDef = new FuncDefinition(
-                                        $ID.getLine(),
-                                        $ID.getCharPositionInLine() + 1,
-                                        $statements,
-                                        $ID.text
-                                    );
-        $ast = funcDef;};
+funcDef returns [FuncDefinition ast]
+        locals [List<Statement> statements = new ArrayList<>()]: //Function type is the only type that cannot be compose
+        (built_in_type | 'void') ID '(' params ')' '{' body '}'
+        {
+            FuncDefinition funcDef = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $statements, $ID.text );
+            $ast = funcDef;
+        };
 
 params returns [List<VarDefinition> ast = new ArrayList<>()]:
         ((parameter {$ast.add($parameter.ast);} ',')*
         parameter {$ast.add($parameter.ast);})?
        ;
 
-parameter returns [VarDefinition ast]: builtInType ID
+parameter returns [VarDefinition ast]: built_in_type ID
          {$ast = new VarDefinition(
              $ID.getLine(),
              $ID.getCharPositionInLine() + 1,
              $ID.text,
-             $builtInType.ast
+             $built_in_type.ast
          );}
          ;
 

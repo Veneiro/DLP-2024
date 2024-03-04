@@ -11,4 +11,11 @@ public class ArrayType extends ASTAbstractNode implements Type {
         this.size = size;
         this.type = type;
     }
+
+    public static ArrayType createArray(int line, int column, int size, Type previousType){
+        if (previousType instanceof ArrayType){
+            //Loop go to the end and connect objects
+        }
+        return new ArrayType(line, column, size, previousType);
+    }
 }

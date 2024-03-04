@@ -1,0 +1,50 @@
+int i, j; // Variable definition
+
+void print(char c) {
+    write c;
+}
+
+int add(int a, int b) { // Function definition
+    return a + b;
+}
+
+void main() {
+    int x, y; // Variable definition inside main
+
+    struct { // Struct definition
+        int val;
+        char letter;
+    } myStruct;
+
+    myStruct.val = 100;
+    myStruct.letter = 'A';
+
+    int[5] array; // Array definition
+
+    x = 10;
+    y = 20;
+
+    array[0] = 1;
+    array[1] = 2;
+    array[2] = 3;
+    array[3] = 4;
+    array[4] = 5;
+
+    while (x > 0) { // While statement
+        x = x - 1;
+    }
+
+    if (y > 15) { // If statement
+        print('Y');
+    } else {
+        print('N');
+    }
+
+    write add(5, 6); // Function invocation as an expression
+
+    read x, y; // Read statement
+
+    print((char)x); // Cast expression
+
+    return; // Return statement
+}

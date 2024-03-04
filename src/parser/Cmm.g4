@@ -14,34 +14,44 @@ program returns [Program ast]: d=definitions { $ast = new Program(0,0,$d.ast); }
     ;
 
 definitions returns [List<Definition> ast = new ArrayList<>()]:
-    (d1=varDef { $ast.addAll($d1.ast); }
-    | d2=funcDef { $ast.add($d2.ast); })*
-    d3=main_func_def { $ast.add($d3.ast); }
+    (def_var=varDef { $ast.addAll($def_var.ast); }
+    | def_func=funcDef { $ast.add($def_func.ast); })*
+    def_main=main_func_def { $ast.add($def_main.ast); }
     ;
 
 expression returns [Expression ast]:
-          ID { $ast = new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text); }
-        | RC = REAL_CONSTANT {$ast = new RealLiteral($ID.getLine(), $ID.getCharPositionInLine()+1, LexerHelper.lexemeToReal($RC.text));}
-        | CC = CHAR_CONSTANT {$ast = new CharLiteral($ID.getLine(), $ID.getCharPositionInLine()+1, LexerHelper.lexemeToChar($CC.text));}
-        | IC = INT_CONSTANT {$ast = new IntLiteral($ID.getLine(), $ID.getCharPositionInLine()+1, LexerHelper.lexemeToInt($IC.text));}
-        | '(' e1=expression ')' {$ast = $e1.ast;}
-        | e1=expression '[' e2=expression ']' {$ast = new Indexing($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast, $e2.ast);}
-        | e1=expression '.' ID {$ast = new FieldAccess($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text, $e1.ast);}
-        | '(' t=built_in_type ')' e=expression {$ast = new Cast($e.ast.getLine(), $e.ast.getColumn(), $t.ast, $e.ast);}
-        | '-' e1=expression {$ast = new UnaryMinus($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast);}
-        | '!' e1=expression {$ast = new UnaryNot($e1.ast.getLine(), $e1.ast.getColumn(), $e1.ast);}
-        | e1=expression OP=('*' | '/' | '%') e2=expression //REVISAR
-            { $ast = Arithmetic.arithmeticFactory($e1.ast.getLine(), $e1.ast.getColumn(),
-                $e1.ast, $OP.text, $e2.ast); }
-        | e1=expression OP=('+' | '-') e2=expression
-            { $ast = new Arithmetic($e1.ast.getLine(), $e1.ast.getColumn(),
-                $e1.ast, $OP.text, $e2.ast); }
-        | e1=expression OP=('<' | '>' | '<=' | '>=' | '==' | '!=') e2=expression
-            { $ast = new Logical($e1.ast.getLine(), $e1.ast.getColumn(),
-                $e1.ast, $OP.text, $e2.ast); }
-        | e1=expression OP=('&&' | '||') e2=expression
-            { $ast = new Logical($e1.ast.getLine(), $e1.ast.getColumn(),
-                $e1.ast, $OP.text, $e2.ast); }
+          ID
+            { $ast = new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text); }
+        | RC = REAL_CONSTANT
+            {$ast = new RealLiteral($RC.getLine(), $RC.getCharPositionInLine()+1, LexerHelper.lexemeToReal($RC.text));}
+        | CC = CHAR_CONSTANT
+            {$ast = new CharLiteral($CC.getLine(), $CC.getCharPositionInLine()+1, LexerHelper.lexemeToChar($CC.text));}
+        | IC = INT_CONSTANT
+            {$ast = new IntLiteral($IC.getLine(), $IC.getCharPositionInLine()+1, LexerHelper.lexemeToInt($IC.text));}
+        | '(' e1=expression ')'
+            {$ast = $e1.ast;}
+        | exp_list=expression '[' exp_index=expression ']'
+            {$ast = new Indexing($exp_list.ast.getLine(), $exp_list.ast.getColumn(), $exp_list.ast, $exp_index.ast);}
+        | exp_to_access=expression '.' ID
+            {$ast = new FieldAccess($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text, $exp_to_access.ast);}
+        | '(' cast_type=built_in_type ')' exp_to_cast=expression
+            {$ast = new Cast($exp_to_cast.ast.getLine(), $exp_to_cast.ast.getColumn(), $cast_type.ast, $exp_to_cast.ast);}
+        | '-' exp_num=expression
+            {$ast = new UnaryMinus($exp_num.ast.getLine(), $exp_num.ast.getColumn(), $exp_num.ast);}
+        | '!' exp_not=expression
+            {$ast = new UnaryNot($exp_not.ast.getLine(), $exp_not.ast.getColumn(), $exp_not.ast);}
+        | exp_left=expression OP=('*' | '/' | '%') exp_right=expression
+            { $ast = Arithmetic.arithmeticFactory($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
+                $exp_left.ast, $OP.text, $exp_right.ast); }
+        | exp_left=expression OP=('+' | '-') exp_right=expression
+            { $ast = new Arithmetic($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
+                $exp_left.ast, $OP.text, $exp_right.ast); }
+        | exp_left=expression OP=('<' | '>' | '<=' | '>=' | '==' | '!=') exp_right=expression
+            { $ast = new Logical($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
+                $exp_left.ast, $OP.text, $exp_right.ast); }
+        | exp_left=expression OP=('&&' | '||') exp_right=expression
+            { $ast = new Logical($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
+                $exp_left.ast, $OP.text, $exp_right.ast); }
         | ID'(' es=expressions ')'
             {$ast = new FuncInvocation($ID.getLine(), $ID.getCharPositionInLine()+1, new Variable($ID.getLine(), $ID.getCharPositionInLine()+1, $ID.text), $es.ast);}
        ;
@@ -95,8 +105,8 @@ block returns [List<Statement> ast = new ArrayList<>()]:
 type returns [Type ast]:
     built_in_type
         {$ast = $built_in_type.ast;}
-    | t2=type '[' INT_CONSTANT ']'
-        {$ast = new ArrayType($t2.ast.getLine(), $t2.ast.getColumn(), $INT_CONSTANT.int, $t2.ast);} //LexemeHelper para el int?
+    | t2=type '[' IC=INT_CONSTANT ']'
+        {$ast = ArrayType.createArray($t2.ast.getLine(), $t2.ast.getColumn(), LexerHelper.lexemeToInt($IC.text), $t2.ast);}
     | s=struct
         {$ast = $s.ast;}
     ;
@@ -127,13 +137,9 @@ ids returns [List<String> ast = new ArrayList<>()]:
     (i1=ID { $ast.add($i1.text); }  ',')* i2=ID { $ast.add($i2.text); }
     ;
 
-funcDef returns [FuncDefinition ast]
-        locals [List<Statement> statements = new ArrayList<>()]: //Function type is the only type that cannot be compose
-        (built_in_type | 'void') ID '(' params ')' '{' body '}'
-        {
-            FuncDefinition funcDef = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $statements, $ID.text );
-            $ast = funcDef;
-        };
+funcDef returns [FuncDefinition ast]: //Function type is the only type that cannot be compose
+        (built_in_type | 'void') ID '(' params ')' '{' b=body '}'
+        {$ast = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $b.ast, $ID.text );};
 
 params returns [List<VarDefinition> ast = new ArrayList<>()]:
         ((parameter {$ast.add($parameter.ast);} ',')*
@@ -149,10 +155,7 @@ parameter returns [VarDefinition ast]: built_in_type ID
          );}
          ;
 
-body returns [List<Statement> ast = new ArrayList<>()]:
-        (varDef {$ast.addAll($varDef.ast);} )*
-        | st1=statement {$ast.add($st1.ast);}
-        | '{' (st2=statement {$ast.add($st2.ast);} )* '}'
+body returns [List<Statement> ast = new ArrayList<>()]: (varDef {$ast.addAll($varDef.ast);} )* (st2=statement {$ast.add($st2.ast);} )*
         ;
 
 struct returns [StructType ast]:
@@ -160,8 +163,17 @@ struct returns [StructType ast]:
      { $ast = new StructType($s.getLine(), $s.getCharPositionInLine()+1, $r.ast);}
      ;
 
-record returns [List<Field> ast = new ArrayList<>()]: varDef*
+record returns [List<Field> ast = new ArrayList<>()]: (field { $ast.addAll($field.ast); } )*
       ;
+
+field returns [List<Field> ast = new ArrayList<>()]: t=type i=ids ';'
+        {
+            for (String id: $i.ast) {
+                $ast.add(new Field($t.ast));
+            }
+        }
+      ;
+
 
 
 // --- LEXER ---

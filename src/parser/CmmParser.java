@@ -6,6 +6,7 @@ package parser;
     import ast.program.*;
     import ast.statement.*;
     import ast.type.*;
+    import ast.errorhandler.*;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -1597,7 +1598,13 @@ public class CmmParser extends Parser {
 			match(T__21);
 
 			            for (String id: ((FieldContext)_localctx).i.ast) {
-			                _localctx.ast.add(new Field(((FieldContext)_localctx).t.ast));
+			                Field f = new Field(id, ((FieldContext)_localctx).t.ast);
+			                if(_localctx.ast.contains(f)){
+			                    ErrorType error = new ErrorType(((FieldContext)_localctx).t.ast.getLine(), ((FieldContext)_localctx).t.ast.getColumn(), "Struct must not have duplicated fields");
+			                    ErrorHandler.getInstance().addError(error);
+			                } else {
+			                    _localctx.ast.add(f);
+			                }
 			            }
 			        
 			}

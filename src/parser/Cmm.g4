@@ -11,6 +11,7 @@ grammar Cmm;
     import ast.program.*;
     import ast.statement.*;
     import ast.type.*;
+    import ast.errorhandler.*;
 }
 
 // --- PARSER ---
@@ -233,7 +234,13 @@ record returns [List<Field> ast = new ArrayList<>()]:
 field returns [List<Field> ast = new ArrayList<>()]: t=type i=ids ';'
         {
             for (String id: $i.ast) {
-                $ast.add(new Field($t.ast));
+                Field f = new Field(id, $t.ast);
+                if($ast.contains(f)){
+                    ErrorType error = new ErrorType($t.ast.getLine(), $t.ast.getColumn(), "Struct must not have duplicated fields");
+                    ErrorHandler.getInstance().addError(error);
+                } else {
+                    $ast.add(f);
+                }
             }
         }
         ;

@@ -6,6 +6,7 @@ package parser;
     import ast.program.*;
     import ast.statement.*;
     import ast.type.*;
+    import ast.errorhandler.*;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

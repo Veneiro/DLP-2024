@@ -4,14 +4,14 @@ import ast.ASTAbstractNode;
 
 public class Arithmetic extends ASTAbstractNode implements Expression {
     public String operator;
-    public Expression firstExp;
-    public Expression secondExp;
+    public Expression first_expression;
+    public Expression second_expression;
 
     public Arithmetic(int line, int column, Expression firstExp, String operator, Expression secondExp) {
         super(line, column);
         this.operator = operator;
-        this.firstExp = firstExp;
-        this.secondExp = secondExp;
+        this.first_expression = firstExp;
+        this.second_expression = secondExp;
     }
 
     public static Expression arithmeticFactory(int line, int column, Expression exp1, String operator, Expression exp2){

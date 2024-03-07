@@ -5,5 +5,5 @@ import ast.type.Type;
 
 public interface Definition extends Statement, Type {
     Type defType = null;
-    String getName();
+    String getVar_name();
 }

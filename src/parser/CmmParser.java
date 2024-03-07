@@ -36,13 +36,13 @@ public class CmmParser extends Parser {
 		RULE_program = 0, RULE_definitions = 1, RULE_expression = 2, RULE_expressions = 3, 
 		RULE_statement = 4, RULE_block = 5, RULE_type = 6, RULE_built_in_type = 7, 
 		RULE_main_func_def = 8, RULE_varDef = 9, RULE_ids = 10, RULE_funcDef = 11, 
-		RULE_returnType = 12, RULE_params = 13, RULE_parameter = 14, RULE_body = 15, 
+		RULE_return_type = 12, RULE_params = 13, RULE_parameter = 14, RULE_body = 15, 
 		RULE_struct = 16, RULE_record = 17, RULE_field = 18;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"program", "definitions", "expression", "expressions", "statement", "block", 
 			"type", "built_in_type", "main_func_def", "varDef", "ids", "funcDef", 
-			"returnType", "params", "parameter", "body", "struct", "record", "field"
+			"return_type", "params", "parameter", "body", "struct", "record", "field"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -734,6 +734,8 @@ public class CmmParser extends Parser {
 				              ((StatementContext)_localctx).ast =  new FunctionInvocation(
 				              ((StatementContext)_localctx).ID.getLine(),
 				              ((StatementContext)_localctx).ID.getCharPositionInLine() + 1,
+				              new Variable(((StatementContext)_localctx).ID.getLine(),
+				                              ((StatementContext)_localctx).ID.getCharPositionInLine()+1, (((StatementContext)_localctx).ID!=null?((StatementContext)_localctx).ID.getText():null)),
 				              ((StatementContext)_localctx).es.ast
 				            );
 				}
@@ -1217,7 +1219,7 @@ public class CmmParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class FuncDefContext extends ParserRuleContext {
 		public FuncDefinition ast;
-		public ReturnTypeContext t;
+		public Return_typeContext t;
 		public Token ID;
 		public ParamsContext params;
 		public BodyContext b;
@@ -1225,8 +1227,8 @@ public class CmmParser extends Parser {
 		public ParamsContext params() {
 			return getRuleContext(ParamsContext.class,0);
 		}
-		public ReturnTypeContext returnType() {
-			return getRuleContext(ReturnTypeContext.class,0);
+		public Return_typeContext return_type() {
+			return getRuleContext(Return_typeContext.class,0);
 		}
 		public BodyContext body() {
 			return getRuleContext(BodyContext.class,0);
@@ -1244,7 +1246,7 @@ public class CmmParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(265);
-			((FuncDefContext)_localctx).t = returnType();
+			((FuncDefContext)_localctx).t = return_type();
 			setState(266);
 			((FuncDefContext)_localctx).ID = match(ID);
 			setState(267);
@@ -1277,21 +1279,21 @@ public class CmmParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ReturnTypeContext extends ParserRuleContext {
+	public static class Return_typeContext extends ParserRuleContext {
 		public Type ast;
 		public Built_in_typeContext built_in_type;
 		public Built_in_typeContext built_in_type() {
 			return getRuleContext(Built_in_typeContext.class,0);
 		}
-		public ReturnTypeContext(ParserRuleContext parent, int invokingState) {
+		public Return_typeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_returnType; }
+		@Override public int getRuleIndex() { return RULE_return_type; }
 	}
 
-	public final ReturnTypeContext returnType() throws RecognitionException {
-		ReturnTypeContext _localctx = new ReturnTypeContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_returnType);
+	public final Return_typeContext return_type() throws RecognitionException {
+		Return_typeContext _localctx = new Return_typeContext(_ctx, getState());
+		enterRule(_localctx, 24, RULE_return_type);
 		try {
 			setState(280);
 			_errHandler.sync(this);
@@ -1302,8 +1304,8 @@ public class CmmParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(275);
-				((ReturnTypeContext)_localctx).built_in_type = built_in_type();
-				 ((ReturnTypeContext)_localctx).ast =  ((ReturnTypeContext)_localctx).built_in_type.ast; 
+				((Return_typeContext)_localctx).built_in_type = built_in_type();
+				 ((Return_typeContext)_localctx).ast =  ((Return_typeContext)_localctx).built_in_type.ast; 
 				}
 				break;
 			case T__33:
@@ -1311,7 +1313,7 @@ public class CmmParser extends Parser {
 				{
 				setState(278);
 				match(T__33);
-				 ((ReturnTypeContext)_localctx).ast =  null; 
+				 ((Return_typeContext)_localctx).ast =  null; 
 				}
 				break;
 			default:

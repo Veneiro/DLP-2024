@@ -14,7 +14,7 @@ public class FuncDefinition extends ASTAbstractNode implements Definition {
     private FunctionType function_type;
 
     @Override
-    public String getName() {
+    public String getVar_name() {
         return name;
     }
 

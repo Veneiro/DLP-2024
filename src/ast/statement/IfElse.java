@@ -3,18 +3,17 @@ package ast.statement;
 import ast.ASTAbstractNode;
 import ast.expression.Expression;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class IfElse extends ASTAbstractNode implements Statement {
-    public List<Statement> ifStat;
-    public List<Statement> elseStat;
+    public List<Statement> if_statement;
+    public List<Statement> else_statement;
     public Expression expr;
 
     public IfElse(int line, int column, List<Statement> ifStat, List<Statement> elseStat, Expression expr) {
         super(line, column);
-        this.ifStat = ifStat;
-        this.elseStat = elseStat;
+        this.if_statement = ifStat;
+        this.else_statement = elseStat;
         this.expr = expr;
     }
 }

@@ -3,11 +3,12 @@ package ast.type;
 import java.util.Objects;
 
 public class Field {
-    public Type fieldType;
+    public Type field_type;
     public String name;
 
     public Field(String name, Type fieldType) {
-        this.fieldType = fieldType;
+        this.name = name;
+        this.field_type = fieldType;
     }
 
     @Override

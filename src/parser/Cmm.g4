@@ -95,6 +95,8 @@ statement returns [Statement ast] locals [List<Statement> else_statements = new 
               $ast = new FunctionInvocation(
               $ID.getLine(),
               $ID.getCharPositionInLine() + 1,
+              new Variable($ID.getLine(),
+                              $ID.getCharPositionInLine()+1, $ID.text),
               $es.ast
             );}
         | i='if' '(' exp=expression ')' if_stmts=block ('else' else_stmts=block {$statement::else_statements = $else_stmts.ast;})?
@@ -181,13 +183,13 @@ ids returns [List<String> ast = new ArrayList<>()]:
  * Function definition production rule, it contains the specification for defining functions in C--
  */
 funcDef returns [FuncDefinition ast]: //Function type is the only type that cannot be compose
-        t=returnType ID '(' params ')' '{' b=body '}'
+        t=return_type ID '(' params ')' '{' b=body '}'
         {
             FunctionType ft = new FunctionType($ID.getLine(), $ID.getCharPositionInLine() + 1, $params.ast, $t.ast);
             $ast = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $b.ast, $ID.text, ft );
         };
 
-returnType returns [Type ast]: built_in_type { $ast = $built_in_type.ast; }
+return_type returns [Type ast]: built_in_type { $ast = $built_in_type.ast; }
     | 'void' { $ast = null; }
     ;
 

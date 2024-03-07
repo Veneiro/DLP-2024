@@ -4,12 +4,12 @@ import ast.ASTAbstractNode;
 import ast.expression.Expression;
 
 public class Assignment extends ASTAbstractNode implements Statement {
-    public Expression assignTo;
-    public Expression toAssign;
+    public Expression assign_to;
+    public Expression to_assign;
 
     public Assignment(int line, int column, Expression assignTo, Expression toAssign) {
         super(line, column);
-        this.assignTo = assignTo;
-        this.toAssign = toAssign;
+        this.assign_to = assignTo;
+        this.to_assign = toAssign;
     }
 }

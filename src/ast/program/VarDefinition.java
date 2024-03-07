@@ -7,16 +7,16 @@ public class VarDefinition extends ASTAbstractNode implements Definition {
 
 
     public Type type;
-    public String name;
+    public String var_name;
 
     public VarDefinition(int line, int column, String name, Type type) {
         super(line, column);
         this.type = type;
-        this.name = name;
+        this.var_name = name;
     }
 
     @Override
-    public String getName() {
+    public String getVar_name() {
         return null;
     }
 }

@@ -23,9 +23,9 @@ public class ErrorHandler {
 
     public boolean anyError() {
         if (errors.isEmpty()) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public void showErrors(PrintStream out) {

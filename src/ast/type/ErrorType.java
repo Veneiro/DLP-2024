@@ -13,7 +13,7 @@ public class ErrorType extends ASTAbstractNode implements Type {
 
     @Override
     public String toString() {
-        return String.format("ERROR: %s in line %i and column %i",
+        return String.format("ERROR: %s | line %d and column %d",
                 this.error_message, this.getLine(), this.getColumn());
     }
 }

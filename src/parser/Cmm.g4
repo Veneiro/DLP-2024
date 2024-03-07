@@ -20,7 +20,8 @@ grammar Cmm;
  * Program production rule
  */
 program returns [Program ast]:
-        d=definitions { $ast = new Program(0,0,$d.ast); }
+        d=definitions
+        def_main=main_func_def  { $ast = new Program(0,0,$d.ast, $def_main.ast); }
         ;
 
 /**
@@ -28,9 +29,7 @@ program returns [Program ast]:
  */
 definitions returns [List<Definition> ast = new ArrayList<>()]:
         (def_var=varDef { $ast.addAll($def_var.ast); }
-        | def_func=funcDef { $ast.add($def_func.ast); })*
-        def_main=main_func_def { $ast.add($def_main.ast); }
-        ;
+        | def_func=funcDef { $ast.add($def_func.ast); })*;
 
 /**
  * Expression production rule, contains all the expressions contained in C--
@@ -84,7 +83,7 @@ expressions returns [List<Expression> ast = new ArrayList<>()]:
 /**
  * Statement production rule, contains all the statements defined in C--
  */
-statement returns [Statement ast]:
+statement returns [Statement ast] locals [List<Statement> else_statements = new ArrayList<>();]:
           r='read' ((toRead=expression ',')* toRead=expression)? ';'
             {$ast = new Read($r.getLine(), $r.getCharPositionInLine()+1, $toRead.ast);}
         | w='write' es_to_write=expressions ';'
@@ -98,13 +97,12 @@ statement returns [Statement ast]:
               $ID.getCharPositionInLine() + 1,
               $es.ast
             );}
-        | {List<Statement> else_statements = new ArrayList<>();}
-        i='if' '(' exp=expression ')' if_stmts=block ('else' else_stmts=block {else_statements = $else_stmts.ast;})?
+        | i='if' '(' exp=expression ')' if_stmts=block ('else' else_stmts=block {$statement::else_statements = $else_stmts.ast;})?
             {$ast = new IfElse(
                 $i.getLine(),
                 $i.getCharPositionInLine() + 1,
                 $if_stmts.ast,
-                else_statements,
+                $statement::else_statements,
                 $exp.ast
             );}
         | wh='while' '(' e1=expression ')' while_block=block
@@ -159,7 +157,7 @@ built_in_type returns [Type ast]:
  */
 main_func_def returns [FuncDefinition ast]:
         'void' main='main' '(' ')' '{' body '}' EOF
-            {$ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main");}
+            {$ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main", null);}
         ;
 
 /**
@@ -183,8 +181,15 @@ ids returns [List<String> ast = new ArrayList<>()]:
  * Function definition production rule, it contains the specification for defining functions in C--
  */
 funcDef returns [FuncDefinition ast]: //Function type is the only type that cannot be compose
-        (built_in_type | 'void') ID '(' params ')' '{' b=body '}'
-        {$ast = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $b.ast, $ID.text );};
+        t=returnType ID '(' params ')' '{' b=body '}'
+        {
+            FunctionType ft = new FunctionType($ID.getLine(), $ID.getCharPositionInLine() + 1, $params.ast, $t.ast);
+            $ast = new FuncDefinition( $ID.getLine(), $ID.getCharPositionInLine() + 1, $b.ast, $ID.text, ft );
+        };
+
+returnType returns [Type ast]: built_in_type { $ast = $built_in_type.ast; }
+    | 'void' { $ast = null; }
+    ;
 
 /**
  * Params production rule, it is used to specify a list of parameters, like the ones used in functions
@@ -222,14 +227,14 @@ struct returns [StructType ast]:
          ;
 
 /**
- * Record production rule
+ * Record production rule, each of the records contained in the struct
  */
 record returns [List<Field> ast = new ArrayList<>()]:
         (field { $ast.addAll($field.ast); } )*
         ;
 
 /**
- * Field production rule
+ * Field production rule, each of the fields in the struct records
  */
 field returns [List<Field> ast = new ArrayList<>()]: t=type i=ids ';'
         {

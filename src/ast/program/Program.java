@@ -8,8 +8,9 @@ import java.util.List;
 public class Program extends ASTAbstractNode {
     public List<Definition> definitions;
 
-    public Program(int line, int column, List<Definition> definitions) {
+    public Program(int line, int column, List<Definition> definitions, FuncDefinition main) {
         super(line, column);
         this.definitions = definitions;
+        definitions.add(main);
     }
 }

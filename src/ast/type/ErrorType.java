@@ -1,6 +1,7 @@
 package ast.type;
 
 import ast.ASTAbstractNode;
+import ast.visitor.Visitor;
 
 public class ErrorType extends ASTAbstractNode implements Type {
 
@@ -15,5 +16,10 @@ public class ErrorType extends ASTAbstractNode implements Type {
     public String toString() {
         return String.format("ERROR: %s | line %d and column %d",
                 this.error_message, this.getLine(), this.getColumn());
+    }
+
+    @Override
+    public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
+        return visitor.visit(this, param);
     }
 }

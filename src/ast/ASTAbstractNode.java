@@ -1,5 +1,8 @@
 package ast;
 
+import ast.type.ErrorType;
+import ast.visitor.Visitor;
+
 public abstract class ASTAbstractNode implements ASTNode {
     private int line;
     private int column;
@@ -16,4 +19,9 @@ public abstract class ASTAbstractNode implements ASTNode {
     public int getColumn(){
         return this.column;
     }
+
+    //@Override
+    //public <TP,TR> TR accept(Visitor visitor, TP param){
+    //    throw new RuntimeException("accept en ASTAbstractNode no se puede llamar");
+    //}
 }

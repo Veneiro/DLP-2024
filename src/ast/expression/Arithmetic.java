@@ -1,8 +1,9 @@
 package ast.expression;
 
 import ast.ASTAbstractNode;
+import ast.visitor.Visitor;
 
-public class Arithmetic extends ASTAbstractNode implements Expression {
+public class Arithmetic extends AbstractExpression {
     public String operator;
     public Expression first_expression;
     public Expression second_expression;
@@ -19,5 +20,10 @@ public class Arithmetic extends ASTAbstractNode implements Expression {
             return new Modulus(line, column, exp1, exp2);
         }
         return new Arithmetic(line, column, exp1, operator, exp2);
+    }
+
+    @Override
+    public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
+        return visitor.visit(this, param);
     }
 }

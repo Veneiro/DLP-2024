@@ -241,7 +241,7 @@ record returns [List<Field> ast = new ArrayList<>()]:
 field returns [List<Field> ast = new ArrayList<>()]: t=type i=ids ';'
         {
             for (String id: $i.ast) {
-                Field f = new Field(id, $t.ast);
+                Field f = new Field($t.ast.getLine(), $t.ast.getColumn(), id, $t.ast);
                 if($ast.contains(f)){
                     ErrorType error = new ErrorType($t.ast.getLine(), $t.ast.getColumn(), "Struct must not have duplicated fields");
                     ErrorHandler.getInstance().addError(error);

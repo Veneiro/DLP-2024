@@ -1,5 +1,6 @@
 import ast.errorhandler.ErrorHandler;
 import ast.program.Program;
+import ast.visitor.TypeCheckingVisitor;
 import introspector.model.IntrospectorModel;
 import introspector.view.IntrospectorView;
 import org.antlr.v4.runtime.CharStream;
@@ -31,7 +32,7 @@ public class Main {
         }
 
         Program ast = parser.program().ast;
-
+        ast.accept(new TypeCheckingVisitor(), null);
         if (ErrorHandler.getInstance().anyError()) {
             ErrorHandler.getInstance().showErrors(System.err);
         } else {

@@ -10,28 +10,30 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
     // EXPRESSIONS
     @Override
     public TR visit(Arithmetic arithmetic, TP param) {
-        super.visit(arithmetic, param);
+        arithmetic.first_expression.accept(this, null);
+        arithmetic.second_expression.accept(this, null);
         arithmetic.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(Cast cast, TP param) {
-        super.visit(cast, param);
+        cast.cast_type.accept(this, null);
+        cast.to_cast.accept(this, null);
         cast.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(CharLiteral charLiteral, TP param) {
-        super.visit(charLiteral, param);
         charLiteral.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(Comparision comparision, TP param) {
-        super.visit(comparision,param);
+        comparision.first_to_compare.accept(this, null);
+        comparision.second_to_compare.accept(this, null);
         comparision.setLValue(false);
         return null;
     }
@@ -40,61 +42,63 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
     public TR visit(Variable variable, TP param) {
         super.visit(variable, param);
         variable.setLValue(true);
+        //variable.varDefinition.accept(this, null);
         return null;
     }
 
     @Override
     public TR visit(Indexing indexing, TP param) {
-        super.visit(indexing, param);
+        indexing.list.accept(this, null);
+        indexing.index.accept(this, null);
         indexing.setLValue(true);
         return null;
     }
 
     @Override
     public TR visit(IntLiteral intLiteral, TP param) {
-        super.visit(intLiteral, param);
         intLiteral.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(Logical logical, TP param) {
-        super.visit(logical, param);
+        logical.first_expression.accept(this, null);
+        logical.second_expression.accept(this, null);
         logical.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(Modulus modulus, TP param) {
-        super.visit(modulus, param);
+        modulus.first_expression.accept(this, null);
+        modulus.second_expression.accept(this, null);
         modulus.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(RealLiteral realLiteral, TP param) {
-        super.visit(realLiteral, param);
         realLiteral.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(UnaryMinus unaryMinus, TP param) {
-        super.visit(unaryMinus, param);
+        unaryMinus.number.accept(this, null);
         unaryMinus.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(UnaryNot unaryNot, TP param) {
-        super.visit(unaryNot, param);
+        unaryNot.to_negate.accept(this, null);
         unaryNot.setLValue(false);
         return null;
     }
 
     @Override
     public TR visit(FieldAccess fieldAccess, TP param) {
-        super.visit(fieldAccess, param);
+        fieldAccess.toAccess.accept(this, null);
         fieldAccess.setLValue(true);
         return null;
     }
@@ -107,12 +111,13 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
     @Override
     public TR visit(Assignment assignment, TP param) {
+        assignment.assign_to.accept(this, param);
+        assignment.to_assign.accept(this, param);
         if(!assignment.assign_to.getLValue()){
             ErrorType error = new ErrorType(assignment.assign_to.getLine(), assignment.assign_to.getColumn(),
                     "Wrong Lvalue for assignment");
             ErrorHandler.getInstance().addError(error);
         }
-        assignment.assign_to.accept(this, param);
         return null;
     }
 

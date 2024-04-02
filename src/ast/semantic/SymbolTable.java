@@ -28,7 +28,7 @@ public class SymbolTable {
     }
     public void reset(){
         table.remove(scope);
-        this.scope = 0;
+        this.scope--;
     }
     public boolean insert(Definition definition){
         Definition definitionToFind = findInCurrentScope(definition.getVar_name());

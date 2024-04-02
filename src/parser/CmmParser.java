@@ -1100,7 +1100,10 @@ public class CmmParser extends Parser {
 			match(T__29);
 			setState(246);
 			match(EOF);
-			((Main_func_defContext)_localctx).ast =  new FuncDefinition(((Main_func_defContext)_localctx).main.getLine(), ((Main_func_defContext)_localctx).main.getCharPositionInLine()+1, ((Main_func_defContext)_localctx).body.ast, "main", null);
+
+			            FunctionType ft = new FunctionType(((Main_func_defContext)_localctx).main.getLine(), ((Main_func_defContext)_localctx).main.getCharPositionInLine() + 1, new ArrayList<VarDefinition>(), null);
+			            ((Main_func_defContext)_localctx).ast =  new FuncDefinition(((Main_func_defContext)_localctx).main.getLine(), ((Main_func_defContext)_localctx).main.getCharPositionInLine()+1, ((Main_func_defContext)_localctx).body.ast, "main", ft);
+			            
 			}
 		}
 		catch (RecognitionException re) {

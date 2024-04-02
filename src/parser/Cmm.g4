@@ -159,7 +159,10 @@ built_in_type returns [Type ast]:
  */
 main_func_def returns [FuncDefinition ast]:
         'void' main='main' '(' ')' '{' body '}' EOF
-            {$ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main", null);}
+            {
+            FunctionType ft = new FunctionType($main.getLine(), $main.getCharPositionInLine() + 1, new ArrayList<VarDefinition>(), null);
+            $ast = new FuncDefinition($main.getLine(), $main.getCharPositionInLine()+1, $body.ast, "main", ft);
+            }
         ;
 
 /**

@@ -7,6 +7,73 @@ import ast.type.*;
 
 public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
+    /**
+     * EXPRESSIONS
+     *
+     * (P) Arithmetic: expression1 -> expression2 expression3
+     * (R) expression1.type = expression2.type.arithmetic(expression3.type)
+     *
+     * (P) Indexing: expression1 -> expression2 expression3
+     * (R) expression1.type = expression2.type.squareBrackets(expression3.type)
+     *
+     * (P) FunctionDefinition: expression1 -> type expression2
+     * (R) expression1.type = expression2.type
+     *
+     * No ID because is terminal and not variable because is non terminal and will be never used
+     * (P) FuncInvocation: expression1 -> expression2 expression*
+     * (R) expression1.type = expression2.type.parenthesis(
+     *  expression*.stream().map(exp -> exp.type).toArray())
+     *
+     * (P) FuncInvocation: statement -> expression expression*
+     * (R) expression.type.parenthesis(expression*.stream().map(exp -> exp.type).toArray())
+     *
+     * (P) Modulus: expression1 -> expression2 expression3
+     * (R) expression1.type = expression2.type.modulus(expression3.type)
+     *
+     * (P) Logical: expression1 -> expression2 expression3
+     * (R) expression1.type = expression2.type.logical(expression3.type)
+     *
+     * (P) Comparison: expression1 -> expression2 expression3
+     * (R) expression1.type = expression2.type.comparison(expression3.type)
+     *
+     * (P) UnaryMinus: expression1 -> expression2
+     * (R) expression1.type = expression2.type.unaryMinus()
+     *
+     * (P) Cast: expression1 -> type expression2
+     * (R) expression1.type = expression2.type.castTo(type)
+     *
+     * (P) VariableDefinition: expression1 -> type expression2
+     * (R) expression1.type = expression2.type
+     *
+     * (P) CharLiteral: expression -> CHAR
+     * (R) expression.type = CHAR
+     *
+     * (P) IntLiteral: expression -> INT
+     * (R) expression.type = INT
+     *
+     * (P) RealLiteral: expression -> REAL
+     * (R) expression.type = REAL
+     *
+     * STATEMENTS
+     * (P) Assignment: statement -> expression expression
+     * (R) expression1.type = expression2.type
+     *
+     * (P) Read: statement -> expression
+     * (R) statement.type = expression.type
+     *
+     * (P) Write: statement -> expression
+     * (R) statement.type = expression.type
+     *
+     * (P) WhileStmt: statement1 -> expression statement2*
+     * (R) expression.type.mustBeBoolean()
+     *
+     * (P) IfElseStmt: statement1 -> expression statement2*
+     * (R) expression.type.mustBeBoolean()
+     *
+     * (P) ReturnStmt: statement -> expression
+     * (R) expression.type.mustBeSameTypeAs(returnType)
+     */
+
     // EXPRESSIONS
     @Override
     public TR visit(Arithmetic arithmetic, TP param) {
@@ -18,8 +85,8 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
     @Override
     public TR visit(Cast cast, TP param) {
-        cast.cast_type.accept(this, null);
-        cast.to_cast.accept(this, null);
+        cast.castType.accept(this, null);
+        cast.toCast.accept(this, null);
         cast.setLValue(false);
         return null;
     }

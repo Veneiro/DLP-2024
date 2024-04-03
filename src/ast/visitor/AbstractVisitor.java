@@ -17,7 +17,7 @@ public class AbstractVisitor<TP, TR> implements Visitor<TP, TR> {
 
     @Override
     public TR visit(Cast cast, TP param) {
-        cast.to_cast.accept(this, null);
+        cast.toCast.accept(this, null);
         return null;
     }
 

@@ -1,17 +1,16 @@
 package ast.expression;
 
-import ast.ASTAbstractNode;
 import ast.type.Type;
 import ast.visitor.Visitor;
 
 public class Cast extends AbstractExpression {
-    public Type cast_type;
-    public Expression to_cast;
+    public Type castType;
+    public Expression toCast;
 
     public Cast(int line, int column, Type castType, Expression toCast) {
         super(line, column);
-        this.cast_type = castType;
-        this.to_cast = toCast;
+        this.castType = castType;
+        this.toCast = toCast;
     }
 
     @Override

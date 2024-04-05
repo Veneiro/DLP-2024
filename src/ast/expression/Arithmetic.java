@@ -1,6 +1,7 @@
 package ast.expression;
 
 import ast.ASTAbstractNode;
+import ast.type.Type;
 import ast.visitor.Visitor;
 
 public class Arithmetic extends AbstractExpression {

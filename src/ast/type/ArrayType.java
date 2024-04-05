@@ -1,9 +1,10 @@
 package ast.type;
 
 import ast.ASTAbstractNode;
+import ast.errorhandler.ErrorHandler;
 import ast.visitor.Visitor;
 
-public class ArrayType extends ASTAbstractNode implements Type {
+public class ArrayType extends AbstractType {
     private int size;
     private Type type;
 
@@ -36,5 +37,18 @@ public class ArrayType extends ASTAbstractNode implements Type {
     @Override
     public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
         return visitor.visit(this, param);
+    }
+
+    @Override
+    public Type squareBrackets(Type type){
+        if (type instanceof IntType){
+            return this.type;
+        } else if (type instanceof ErrorType){
+            return type;
+        } else {
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Array index must be an integer");
+            ErrorHandler.getInstance().addError(error);
+            return error;
+        }
     }
 }

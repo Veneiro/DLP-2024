@@ -1,6 +1,8 @@
 package ast.expression;
 
 import ast.ASTAbstractNode;
+import ast.type.CharType;
+import ast.type.Type;
 import ast.visitor.Visitor;
 
 public class CharLiteral extends AbstractExpression {

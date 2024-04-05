@@ -3,4 +3,19 @@ package ast.type;
 import ast.ASTNode;
 
 public interface Type extends ASTNode {
+    Type arithmetic(Type type);
+
+    Type castTo(Type type);
+
+    Type comparison(Type type);
+
+    Type squareBrackets(Type type);
+
+    Type logical(Type type);
+
+    Type modulus(Type type);
+
+    Type unaryMinus();
+
+    Type fieldAccess(Type type);
 }

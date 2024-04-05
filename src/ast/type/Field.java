@@ -1,11 +1,12 @@
 package ast.type;
 
 import ast.ASTAbstractNode;
+import ast.errorhandler.ErrorHandler;
 import ast.visitor.Visitor;
 
 import java.util.Objects;
 
-public class Field extends ASTAbstractNode implements Type {
+public class Field extends AbstractType {
     public Type field_type;
     public String name;
 

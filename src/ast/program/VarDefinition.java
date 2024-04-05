@@ -6,7 +6,6 @@ import ast.visitor.Visitor;
 
 public class VarDefinition extends ASTAbstractNode implements Definition {
 
-
     public Type type;
     public String var_name;
     public int scope;

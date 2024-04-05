@@ -3,6 +3,7 @@ package ast.program;
 import ast.ASTAbstractNode;
 import ast.statement.Statement;
 import ast.type.FunctionType;
+import ast.type.Type;
 import ast.visitor.Visitor;
 
 import java.util.ArrayList;

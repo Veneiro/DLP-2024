@@ -1,12 +1,13 @@
 package ast.type;
 
 import ast.ASTAbstractNode;
+import ast.errorhandler.ErrorHandler;
 import ast.program.VarDefinition;
 import ast.visitor.Visitor;
 
 import java.util.List;
 
-public class FunctionType extends ASTAbstractNode implements Type {
+public class FunctionType extends AbstractType {
     public List<VarDefinition> definitions;
     public Type return_type;
 

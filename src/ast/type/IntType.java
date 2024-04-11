@@ -84,4 +84,9 @@ public class IntType extends AbstractType {
     public Type unaryMinus() {
         return this;
     }
+
+    @Override
+    public int numberOfBytes() {
+        return 2;
+    }
 }

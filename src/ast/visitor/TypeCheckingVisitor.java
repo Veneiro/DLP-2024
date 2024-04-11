@@ -5,6 +5,8 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
+import java.util.stream.Collectors;
+
 public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
     /**
@@ -12,10 +14,6 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      * (P) FunctionDefinition: expression1 -> type expression2
      * (R) type.returnType.isSimpleType()
      *
-     * No ID because is terminal and not variable because is non terminal and will be never used
-     * (P) FuncInvocation: expression1 -> expression2 expression*
-     * (R) expression1.type = expression2.type.parenthesis(
-     *  expression*.stream().map(exp -> exp.type).toArray())
      *
      * (P) FuncInvocation: statement -> expression expression*
      * (R) expression.type.parenthesis(expression*.stream().map(exp -> exp.type).toArray())
@@ -107,9 +105,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      */
     @Override
     public TR visit(Variable variable, TP param) {
-        variable.varDefinition.accept(this, null);
         variable.setLValue(true);
-        variable.setType(variable.getType());
+        System.out.println(variable.name);
+        variable.setType(variable.getDefinition().getType());
         return null;
     }
 
@@ -223,7 +221,7 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
     public TR visit(FieldAccess fieldAccess, TP param) {
         fieldAccess.toAccess.accept(this, null);
         fieldAccess.setLValue(true);
-        fieldAccess.setType(fieldAccess.toAccess.getType().fieldAccess(fieldAccess.toAccess.getType()));
+        fieldAccess.setType(fieldAccess.toAccess.getType().fieldAccess(fieldAccess.name));
         return null;
     }
 
@@ -264,5 +262,22 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
         super.visit(read, param);
         return null;
     }
+
+    /**
+     * No ID because is terminal and not variable because is non terminal and will be never used
+     * (P) FuncInvocation: expression1 -> expression2 expression*
+     * (R) expression1.type = expression2.type.parenthesis(
+     * expression*.stream().map(exp -> exp.type).toArray())
+     */
+   @Override
+    public TR visit(FuncInvocation funcInvocation, TP param) {
+        funcInvocation.variable.accept(this, null);
+        for(Expression e : funcInvocation.expressions){
+            e.accept(this, null);
+        }
+        funcInvocation.setLValue(false);
+        funcInvocation.setType(funcInvocation.getType().parenthesis(funcInvocation.expressions.stream().map(Expression::getType).collect(Collectors.toList())));
+    return null;
+}
 
 }

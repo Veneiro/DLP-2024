@@ -21,4 +21,21 @@ public class FunctionType extends AbstractType {
     public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
         return visitor.visit(this, param);
     }
+
+    @Override
+    public Type parenthesis(List<Type> types) {
+        if (types.size() != definitions.size()) {
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Number of parameters does not match");
+            ErrorHandler.getInstance().addError(error);
+            return error;
+        }
+        for (int i = 0; i < types.size(); i++) {
+            if (!types.get(i).equals(definitions.get(i).getType())) {
+                ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Parameter type does not match");
+                ErrorHandler.getInstance().addError(error);
+                return error;
+            }
+        }
+        return return_type;
+    }
 }

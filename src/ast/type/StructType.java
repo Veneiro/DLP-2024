@@ -20,14 +20,23 @@ public class StructType extends AbstractType {
     }
 
     @Override
-    public Type fieldAccess(Type type) {
+    public Type fieldAccess(String name) {
         for (Field field : struct_fields) {
-            if (field.name.equals(type.toString())) {
+            if (field.name.equals(name)) {
                 return field.field_type;
             }
         }
         ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Field not found in struct");
         ErrorHandler.getInstance().addError(error);
         return error;
+    }
+
+    @Override
+    public int numberOfBytes() {
+        int bytes = 0;
+        for (Field field : struct_fields) {
+            bytes += field.field_type.numberOfBytes();
+        }
+        return bytes;
     }
 }

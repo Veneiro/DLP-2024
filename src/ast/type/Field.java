@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Field extends AbstractType {
     public Type field_type;
     public String name;
+    public int offset;
 
     public Field(int line, int column, String name, Type fieldType) {
         super(line, column);
@@ -32,5 +33,16 @@ public class Field extends AbstractType {
     @Override
     public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
         return visitor.visit(this, param);
+    }
+
+    @Override
+    public int numberOfBytes() {
+        return field_type.numberOfBytes();
+    }
+    public int getOffset() {
+        return offset;
+    }
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 }

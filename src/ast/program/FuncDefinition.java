@@ -9,17 +9,9 @@ import ast.visitor.Visitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FuncDefinition extends ASTAbstractNode implements Definition {
+public class FuncDefinition extends AbstractDefinition {
     public List<Statement> statements;
-    private String name;
     private int scope;
-
-    private FunctionType function_type;
-
-    @Override
-    public String getVar_name() {
-        return name;
-    }
 
     @Override
     public int getScope() {
@@ -31,15 +23,9 @@ public class FuncDefinition extends ASTAbstractNode implements Definition {
         this.scope = scope;
     }
 
-    public FunctionType getType(){
-        return function_type;
-    }
-
     public FuncDefinition(int line, int column, List<Statement> statements, String name, FunctionType function_type) {
-        super(line, column);
+        super(line, column, function_type, name);
         this.statements = statements;
-        this.name = name;
-        this.function_type = function_type;
     }
 
     @Override

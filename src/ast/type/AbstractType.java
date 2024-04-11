@@ -3,6 +3,8 @@ package ast.type;
 import ast.ASTAbstractNode;
 import ast.visitor.Visitor;
 
+import java.util.List;
+
 public abstract class AbstractType extends ASTAbstractNode implements Type {
 
     public AbstractType(int line, int column) {
@@ -69,11 +71,17 @@ public abstract class AbstractType extends ASTAbstractNode implements Type {
     }
 
     @Override
-    public Type fieldAccess(Type type) {
-        if (type instanceof ErrorType){
-            return type;
-        } else {
-            return new ErrorType(this.getLine(), this.getColumn(), "ERROR: Invalid Type for field access operation");
-        }
+    public Type fieldAccess(String name) {
+        return new ErrorType(this.getLine(), this.getColumn(), "ERROR: Invalid Type for field access operation");
+    }
+
+    @Override
+    public Type parenthesis(List<Type> types) {
+        return new ErrorType(this.getLine(), this.getColumn(), "ERROR: Invalid Type for parenthesis operation");
+    }
+
+    @Override
+    public int numberOfBytes() {
+        return 0;
     }
 }

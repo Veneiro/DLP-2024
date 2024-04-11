@@ -20,7 +20,7 @@ public class IdentificationVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
             ErrorType error = new ErrorType(
                     varDefinition.getLine(),
                     varDefinition.getColumn(),
-                    String.format("Repeated variable definition for '%s'", varDefinition.getVar_name())
+                    String.format("Repeated variable definition for '%s'", varDefinition.getName())
             );
             ErrorHandler.getInstance().addError(error);
         }
@@ -50,7 +50,7 @@ public class IdentificationVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
             ErrorType error = new ErrorType(
                     funcDefinition.getLine(),
                     funcDefinition.getColumn(),
-                    String.format("Repeated function definition for '%s'", funcDefinition.getVar_name()));
+                    String.format("Repeated function definition for '%s'", funcDefinition.getName()));
             ErrorHandler.getInstance().addError(error);
         }
         table.set();

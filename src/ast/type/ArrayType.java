@@ -51,4 +51,9 @@ public class ArrayType extends AbstractType {
             return error;
         }
     }
+
+    @Override
+    public int numberOfBytes(){
+        return size * type.numberOfBytes();
+    }
 }

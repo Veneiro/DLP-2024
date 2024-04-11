@@ -58,4 +58,9 @@ public class DoubleType extends AbstractType {
     public Type unaryMinus() {
         return this;
     }
+
+    @Override
+    public int numberOfBytes() {
+        return 4;
+    }
 }

@@ -4,21 +4,26 @@ import ast.ASTAbstractNode;
 import ast.type.Type;
 import ast.visitor.Visitor;
 
-public class VarDefinition extends ASTAbstractNode implements Definition {
+public class VarDefinition extends AbstractDefinition {
 
     public Type type;
     public String var_name;
     public int scope;
 
+    public int offset;
+
     public VarDefinition(int line, int column, String name, Type type) {
-        super(line, column);
+        super(line, column, type, name);
         this.type = type;
         this.var_name = name;
     }
 
-    @Override
-    public String getVar_name() {
-        return var_name;
+    public int getOffset() {
+        return this.offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
     @Override

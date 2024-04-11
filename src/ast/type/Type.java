@@ -2,6 +2,8 @@ package ast.type;
 
 import ast.ASTNode;
 
+import java.util.List;
+
 public interface Type extends ASTNode {
     Type arithmetic(Type type);
 
@@ -17,5 +19,9 @@ public interface Type extends ASTNode {
 
     Type unaryMinus();
 
-    Type fieldAccess(Type type);
+    Type fieldAccess(String name);
+
+    Type parenthesis(List<Type> types);
+
+    int numberOfBytes();
 }

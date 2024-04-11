@@ -5,7 +5,8 @@ import ast.type.Type;
 
 public interface Definition extends Statement {
     Type defType = null;
-    String getVar_name();
+    Type getType();
+    String getName();
     int getScope();
     void setScope(int scope);
 }

@@ -31,9 +31,9 @@ public class SymbolTable {
         this.scope--;
     }
     public boolean insert(Definition definition){
-        Definition definitionToFind = findInCurrentScope(definition.getVar_name());
+        Definition definitionToFind = findInCurrentScope(definition.getName());
         if(definitionToFind == null) {
-            table.get(scope).put(definition.getVar_name(), definition);
+            table.get(scope).put(definition.getName(), definition);
             definition.setScope(scope);
             return true;
         }

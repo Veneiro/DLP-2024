@@ -70,4 +70,9 @@ public class CharType extends AbstractType {
     public Type unaryMinus() {
         return new IntType(this.getLine(), this.getColumn());
     }
+
+    @Override
+    public int numberOfBytes(){
+        return 1;
+    }
 }

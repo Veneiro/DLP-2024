@@ -2,6 +2,7 @@ package ast.type;
 
 import ast.ASTAbstractNode;
 import ast.errorhandler.ErrorHandler;
+import ast.program.AbstractDefinition;
 import ast.visitor.Visitor;
 
 public class DoubleType extends AbstractType {
@@ -62,5 +63,10 @@ public class DoubleType extends AbstractType {
     @Override
     public int numberOfBytes() {
         return 4;
+    }
+
+    @Override
+    public boolean mustBeSubtype(Type type) {
+        return type instanceof DoubleType;
     }
 }

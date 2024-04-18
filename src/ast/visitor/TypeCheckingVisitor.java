@@ -2,6 +2,7 @@ package ast.visitor;
 
 import ast.errorhandler.ErrorHandler;
 import ast.expression.*;
+import ast.program.FuncDefinition;
 import ast.statement.*;
 import ast.type.*;
 
@@ -13,24 +14,74 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      * EXPRESSIONS
      * (P) FunctionDefinition: expression1 -> type expression2
      * (R) type.returnType.isSimpleType()
-     *
-     *
+     */
+    @Override
+    public TR visit(FuncDefinition functionDefinition, TP param) {
+        functionDefinition.statements.forEach(stmt -> stmt.accept(this, null));
+        functionDefinition.getType().accept(this, null);
+        if(((FunctionType)functionDefinition.getType()).return_type == null) {
+            functionDefinition.statements.stream().forEach(st -> {
+                if(st instanceof Return) {
+                    new ErrorType(
+                            st.getLine(),
+                            st.getColumn(),
+                            "Return statement in Void function");
+                }
+            });
+        } else {
+
+        }
+        return null;
+    }
+     /**
      * (P) FuncInvocation: statement -> expression expression*
      * (R) expression.type.parenthesis(expression*.stream().map(exp -> exp.type).toArray())
-     *
-     * STATEMENTS
+     */
+
+     /** STATEMENTS
      * (P) Write: statement -> expression
      * (R) expression.type.isSimpleType()
-     *
+     */
+
+     /**
      * (P) WhileStmt: statement1 -> expression statement2*
      * (R) expression.type.mustBeBoolean()
-     *
+     */
+     @Override
+     public TR visit(While aWhile, TP param) {
+         super.visit(aWhile, null);
+         aWhile.while_expression.getType().logical(aWhile.while_expression.getType());
+         return null;
+     }
+
+     /**
      * (P) IfElseStmt: statement1 -> expression statement2*
      * (R) expression.type.mustBeBoolean()
-     *
+     */
+     @Override
+     public TR visit(IfElse ifElse, TP param) {
+         super.visit(ifElse, null);
+         ifElse.expr.getType().logical(ifElse.expr.getType());
+         return null;
+     }
+
+     /**
      * (P) ReturnStmt: statement -> expression
      * (R) expression.type.mustBeSameTypeAs(returnType)
      */
+     @Override
+     public TR visit(Return aReturn, TP param) {
+         super.visit(aReturn, null);
+         if(!(param == null)) {
+             new ErrorType(
+                     aReturn.getLine(),
+                     aReturn.getColumn(),
+                     String.format("Return statement is returning " +
+                             "an expression of type %s that is not a " +
+                             "subtype of the return type %s", aReturn.to_return.getType(), param));
+         }
+         return null;
+     }
 
     // EXPRESSIONS
 

@@ -84,4 +84,9 @@ public abstract class AbstractType extends ASTAbstractNode implements Type {
     public int numberOfBytes() {
         return 0;
     }
+
+    @Override
+    public boolean mustBeSubtype(Type param) {
+        return false;
+    }
 }

@@ -89,4 +89,12 @@ public class IntType extends AbstractType {
     public int numberOfBytes() {
         return 2;
     }
+
+    @Override
+    public boolean mustBeSubtype(Type type) {
+        if(type instanceof IntType || type instanceof DoubleType) {
+            return true;
+        }
+        return false;
+    }
 }

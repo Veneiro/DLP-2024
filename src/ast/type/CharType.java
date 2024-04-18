@@ -75,4 +75,9 @@ public class CharType extends AbstractType {
     public int numberOfBytes(){
         return 1;
     }
+
+    @Override
+    public boolean mustBeSubtype(Type type){
+        return true;
+    }
 }

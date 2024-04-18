@@ -1,6 +1,7 @@
 package ast.type;
 
 import ast.ASTNode;
+import ast.statement.Return;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface Type extends ASTNode {
     Type parenthesis(List<Type> types);
 
     int numberOfBytes();
+
+    boolean mustBeSubtype(Type param);
 }

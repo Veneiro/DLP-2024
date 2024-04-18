@@ -27,4 +27,6 @@ public interface Type extends ASTNode {
     int numberOfBytes();
 
     boolean mustBeSubtype(Type param);
+
+    char suffix();
 }

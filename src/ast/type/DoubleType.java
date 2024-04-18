@@ -69,4 +69,9 @@ public class DoubleType extends AbstractType {
     public boolean mustBeSubtype(Type type) {
         return type instanceof DoubleType;
     }
+
+    @Override
+    public char suffix() {
+        return 'f';
+    }
 }

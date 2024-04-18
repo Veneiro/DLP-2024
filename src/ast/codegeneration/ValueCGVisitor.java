@@ -74,13 +74,10 @@ public class ValueCGVisitor {
      *          case '>=':
      *              <gei> expression1.type.suffix()
      *              break;
+     *          default: assert false;
      *
-     *
-     *   value[[Cast: expression1 -> type expression2]]=
-     *      value[[expression2]]
-     *      expression2.type.convertTo(type)
-     *
-     *   value[[Read: statement -> expression]]=
-     *
+     *      execute[[Cast: expression1 -> type expression2]]=
+     *          value[[expression2]]
+     *          expression2.type.convertTo(type)
      */
 }

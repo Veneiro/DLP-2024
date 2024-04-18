@@ -89,4 +89,10 @@ public abstract class AbstractType extends ASTAbstractNode implements Type {
     public boolean mustBeSubtype(Type param) {
         return false;
     }
+
+    @Override
+    public char suffix() {
+        assert false;
+        return ' ';
+    }
 }

@@ -80,4 +80,9 @@ public class CharType extends AbstractType {
     public boolean mustBeSubtype(Type type){
         return true;
     }
+
+    @Override
+    public char suffix() {
+        return 'b';
+    }
 }

@@ -1,6 +1,7 @@
 import ast.errorhandler.ErrorHandler;
 import ast.program.Program;
 import ast.visitor.IdentificationVisitor;
+import ast.visitor.OffsetVisitor;
 import ast.visitor.TypeCheckingVisitor;
 import introspector.model.IntrospectorModel;
 import introspector.view.IntrospectorView;
@@ -38,6 +39,7 @@ public class Main {
         if (ErrorHandler.getInstance().anyError()) {
             ErrorHandler.getInstance().showErrors(System.err);
         } else {
+            ast.accept(new OffsetVisitor<>(), null);
             IntrospectorModel model = new IntrospectorModel("Program", ast);
             new IntrospectorView("Introspector", model);
         }

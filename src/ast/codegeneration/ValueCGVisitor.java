@@ -43,22 +43,9 @@ public class ValueCGVisitor {
      *      Type superType = expression2.type.superType(expression1.type)
      *      value[[expression2]]
      *      expression2.type.convertTo(superType)
-     *
-     *  value[[Logical: expression1 -> expression2 expression3]]=
-     *      value[[expression2]]
-     *      expression2.type.convertTo(expression1.type)
      *      value[[expression3]]
      *      expression3.type.convertTo(expression1.type)
      *      switch(){
-     *          case '&&':
-     *              <and> expression1.type.suffix()
-     *              break;
-     *          case '||':
-     *              <or> expression1.type.suffix()
-     *              break;
-     *          case '!':
-     *              <not> expression1.type.suffix()
-     *              break;
      *          case '==':
      *              <eqi> expression1.type.suffix()
      *              break;
@@ -76,7 +63,21 @@ public class ValueCGVisitor {
      *              break;
      *          default: assert false;
      *
-     *      execute[[Cast: expression1 -> type expression2]]=
+     *  value[[Logical: expression1 -> expression2 expression3]]=
+     *      value[[expression2]]
+     *      expression2.type.convertTo(expression1.type)
+     *      value[[expression3]]
+     *      expression3.type.convertTo(expression1.type)
+     *      switch(){
+     *          case '&&':
+     *              <and> expression1.type.suffix()
+     *              break;
+     *          case '||':
+     *              <or> expression1.type.suffix()
+     *              break;
+     *          default: assert false;
+     *
+     *  value[[Cast: expression1 -> type expression2]]=
      *          value[[expression2]]
      *          expression2.type.convertTo(type)
      */

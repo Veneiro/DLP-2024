@@ -22,6 +22,7 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
              funcType.definitions.get(i).setOffset(offset + 4);
              offset += funcType.definitions.get(i).getType().numberOfBytes();
          }
+         super.visit(funcType, param);
          return null;
      }
 
@@ -51,10 +52,7 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
             varDefinition.setOffset(nObGlobal);
             nObGlobal += varDefinition.getType().numberOfBytes();
         } else { //Local
-            varDefinition.setOffset(nObLocal);
+            nObLocal -= varDefinition.getType().numberOfBytes();
             nObLocal += varDefinition.getType().numberOfBytes();
-        }
-        return null;
-    }
 
 }

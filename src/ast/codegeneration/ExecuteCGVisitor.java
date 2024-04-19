@@ -1,11 +1,37 @@
 package ast.codegeneration;
 
-public class ExecuteCGVisitor {
+import ast.expression.FieldAccess;
+import ast.statement.Read;
+import ast.visitor.AbstractVisitor;
+import ast.visitor.Visitor;
+
+public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
+
+    private AddressCGVisitor addressCGVisitor;
+    private CodeGenerator codeGenerator;
+
+    public ExecuteCGVisitor(CodeGenerator codeGenerator) {
+        this.codeGenerator = codeGenerator;
+    }
+
+    public void setAddressCGVisitor(AddressCGVisitor addressCGVisitor) {
+        this.addressCGVisitor = addressCGVisitor;
+    }
+
     /**
      *
      *   execute[[Read: statement -> expression]]=
      *      address[[expression]]
      *      <in> expression.type.suffix()
+     */
+    @Override
+    public TR visit(Read read, TP param) {
+        read.to_read.accept(addressCGVisitor, param);
+        codeGenerator.in(read.to_read.getType());
+
+        return null;
+    }
+    /*
      *
      *   execute[[Write: statement -> expression]]=
      *      value[[expression]]

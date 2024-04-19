@@ -1,6 +1,8 @@
 package ast.codegeneration;
 
-public class AddressCGVisitor {
+import ast.visitor.AbstractVisitor;
+
+public class AddressCGVisitor<TP, TR> extends AbstractVisitor<TP,TR> {
 
     /**
      * address[[Variable: expression -> ID]]=

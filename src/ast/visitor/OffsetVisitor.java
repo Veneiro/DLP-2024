@@ -47,12 +47,28 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
      * &local = BP - Σ( noB(type(prev locals including itself)))
      * (P) VariableDefinition: definition -> type ID*
      */
-    public TR visit(VarDefinition varDefinition, TP param){
-        if(varDefinition.getScope() == 0){ //Global
+    public TR visit(VarDefinition varDefinition, TP param) {
+        if (varDefinition.getScope() == 0) { //Global
             varDefinition.setOffset(nObGlobal);
             nObGlobal += varDefinition.getType().numberOfBytes();
         } else { //Local
             nObLocal -= varDefinition.getType().numberOfBytes();
-            nObLocal += varDefinition.getType().numberOfBytes();
+            varDefinition.setOffset(nObLocal);
+        }
+        return null;
+    }
 
+    @Override
+    public TR visit(FuncDefinition funcDefinition, TP param) {
+        nObLocal = 0;
+        funcDefinition.statements.forEach(s -> s.accept(this, param));
+
+        int nParam = 4;
+        FunctionType fType = (FunctionType) funcDefinition.getType();
+        for (int i = fType.definitions.size() - 1; i >= 0; i--) {
+            fType.definitions.get(i).setOffset(nParam);
+            nParam += fType.definitions.get(i).getType().numberOfBytes();
+        }
+        return null;
+    }
 }

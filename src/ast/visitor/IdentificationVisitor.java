@@ -15,7 +15,7 @@ public class IdentificationVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
     @Override
     public TR visit(VarDefinition varDefinition, TP param) {
-        varDefinition.type.accept(this, null);
+        varDefinition.getType().accept(this, null);
         if (!table.insert(varDefinition)) {
             ErrorType error = new ErrorType(
                     varDefinition.getLine(),

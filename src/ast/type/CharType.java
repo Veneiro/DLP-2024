@@ -44,7 +44,10 @@ public class CharType extends AbstractType {
     public Type castTo(Type type) {
         if(this.getClass() == type.getClass()){
             return this;
-        } else if (type instanceof ErrorType){
+        } else if (type instanceof IntType){
+            return new IntType(this.getLine(), this.getColumn());
+        }
+        else if (type instanceof ErrorType){
             return type;
         } else {
             ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Cast operation between different types");

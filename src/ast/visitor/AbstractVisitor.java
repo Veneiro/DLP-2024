@@ -156,13 +156,13 @@ public class AbstractVisitor<TP, TR> implements Visitor<TP, TR> {
 
     @Override
     public TR visit(Write write, TP param) {
-        write.to_write.forEach(toWrite -> toWrite.accept(this, null));
+        write.toWrite.accept(this, null);
         return null;
     }
 
     @Override
     public TR visit(ArrayType arrayType, TP param) {
-        arrayType.accept(this, null);
+        arrayType.type.accept(this, null);
         return null;
     }
 

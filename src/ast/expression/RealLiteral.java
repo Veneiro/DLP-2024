@@ -16,4 +16,7 @@ public class RealLiteral extends AbstractExpression {
         return visitor.visit(this, param);
     }
 
+    public double getValue() {
+        return this.value;
+    }
 }

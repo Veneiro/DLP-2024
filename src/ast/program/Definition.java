@@ -9,4 +9,6 @@ public interface Definition extends Statement {
     String getName();
     int getScope();
     void setScope(int scope);
+
+    int getOffset();
 }

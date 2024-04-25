@@ -83,39 +83,49 @@ expressions returns [List<Expression> ast = new ArrayList<>()]:
 /**
  * Statement production rule, contains all the statements defined in C--
  */
-statement returns [Statement ast] locals [List<Statement> else_statements = new ArrayList<>();]:
-          r='read' ((toRead=expression ',')* toRead=expression)? ';'
-            {$ast = new Read($r.getLine(), $r.getCharPositionInLine()+1, $toRead.ast);}
-        | w='write' es_to_write=expressions ';'
-            {$ast = new Write($w.getLine(), $w.getCharPositionInLine()+1, $es_to_write.ast);}
+statement returns [List<Statement> ast = new ArrayList<Statement>()] locals [List<Statement> else_statements = new ArrayList<>();]:
+           { List<Expression> exprs = new ArrayList<>(); }
+          r='read' ((toRead=expression { exprs.add($toRead.ast); } ',')* toRead=expression { exprs.add($toRead.ast); })? ';'
+            {
+                for (Expression expr: exprs) {
+                    $ast.add(new Read($r.getLine(), $r.getCharPositionInLine()+1, expr));
+                }
+            }
+        | { List<Expression> exprs = new ArrayList<>(); }
+        w='write' ((es_to_write=expression {exprs.add($es_to_write.ast);} ',')* es_to_write=expression {exprs.add($es_to_write.ast);})? ';'
+            {
+                for (Expression expr: exprs) {
+                    $ast.add(new Write($w.getLine(), $w.getCharPositionInLine()+1, expr));
+                }
+            }
         | assignTo=expression '=' toAssign=expression';'
-            {$ast = new Assignment($assignTo.ast.getLine(), $assignTo.ast.getColumn(), $assignTo.ast, $toAssign.ast);}
+            {$ast.add(new Assignment($assignTo.ast.getLine(), $assignTo.ast.getColumn(), $assignTo.ast, $toAssign.ast));}
         | ID'(' es=expressions ')' ';'
             {
-              $ast = new FunctionInvocation(
+              $ast.add(new FunctionInvocation(
               $ID.getLine(),
               $ID.getCharPositionInLine() + 1,
               new Variable($ID.getLine(),
                               $ID.getCharPositionInLine()+1, $ID.text),
-              $es.ast
+              $es.ast)
             );}
         | i='if' '(' exp=expression ')' if_stmts=block ('else' else_stmts=block {$statement::else_statements = $else_stmts.ast;})?
-            {$ast = new IfElse(
+            {$ast.add(new IfElse(
                 $i.getLine(),
                 $i.getCharPositionInLine() + 1,
                 $if_stmts.ast,
                 $statement::else_statements,
-                $exp.ast
+                $exp.ast)
             );}
         | wh='while' '(' e1=expression ')' while_block=block
-            {$ast = new While(
+            {$ast.add(new While(
                 $wh.getLine(),
                 $wh.getCharPositionInLine() + 1,
                 $while_block.ast,
-                $e1.ast
+                $e1.ast)
             );}
         | 'return' exp_to_return=expression ';'
-            {$ast = new Return($exp_to_return.ast.getLine(), $exp_to_return.ast.getColumn(), $exp_to_return.ast);}
+            {$ast.add(new Return($exp_to_return.ast.getLine(), $exp_to_return.ast.getColumn(), $exp_to_return.ast));}
         ;
 
 /**
@@ -124,9 +134,9 @@ statement returns [Statement ast] locals [List<Statement> else_statements = new 
  */
 block returns [List<Statement> ast = new ArrayList<>()]:
         st1=statement
-            {$ast.add($st1.ast);}
+            {$ast.addAll($st1.ast);}
         | '{' (st2=statement
-            {$ast.add($st2.ast);} )* '}'
+            {$ast.addAll($st2.ast);} )* '}'
         ;
 
 /**
@@ -220,7 +230,7 @@ parameter returns [VarDefinition ast]: built_in_type ID
  * Body production rule, it is the definition for the body of the functions in C--, it is different from block
  */
 body returns [List<Statement> ast = new ArrayList<>()]:
-        (varDef {$ast.addAll($varDef.ast);} )* (st2=statement {$ast.add($st2.ast);} )*
+        (varDef {$ast.addAll($varDef.ast);} )* (st2=statement {$ast.addAll($st2.ast);} )*
         ;
 
 /**

@@ -7,11 +7,11 @@ import ast.visitor.Visitor;
 import java.util.List;
 
 public class Write extends ASTAbstractNode implements Statement {
-    public List<Expression> to_write;
+    public Expression toWrite;
 
-    public Write(int line, int column, List<Expression> toWrite) {
+    public Write(int line, int column, Expression toWrite) {
         super(line, column);
-        this.to_write = toWrite;
+        this.toWrite = toWrite;
     }
 
     @Override

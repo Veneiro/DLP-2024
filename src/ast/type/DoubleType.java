@@ -18,8 +18,10 @@ public class DoubleType extends AbstractType {
 
     @Override
     public Type arithmetic(Type type) {
-        if(this.getClass() == type.getClass()){
+        if (this.getClass() == type.getClass()) {
             return this;
+        } else if (type instanceof IntType) {
+            return new IntType(this.getLine(), this.getColumn());
         } else if (type instanceof ErrorType){
             return type;
         } else {

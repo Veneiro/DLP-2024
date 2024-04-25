@@ -30,8 +30,12 @@ public class IntType extends AbstractType {
 
     @Override
     public Type castTo(Type type) {
-        if(this.getClass() == type.getClass()){
+        if (this.getClass() == type.getClass()) {
             return this;
+        } else if (type instanceof DoubleType) {
+            return new DoubleType(this.getLine(), this.getColumn());
+        } else if (type instanceof CharType) {
+            return new CharType(this.getLine(), this.getColumn());
         } else if (type instanceof ErrorType){
             return type;
         } else {

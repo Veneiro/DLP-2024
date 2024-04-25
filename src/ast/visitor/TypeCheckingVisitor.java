@@ -305,6 +305,7 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      */
     @Override
     public TR visit(Read read, TP param) {
+        read.to_read.accept(this, null);
         if(!read.to_read.getLValue()){
             ErrorType error = new ErrorType(read.to_read.getLine(), read.to_read.getColumn(),
                     "Wrong Lvalue for read");

@@ -3,7 +3,7 @@ package ast.program;
 import ast.ASTAbstractNode;
 import ast.type.Type;
 
-public abstract class AbstractDefinition extends ASTAbstractNode implements Definition{
+public abstract class AbstractDefinition extends ASTAbstractNode implements Definition {
     private final Type type;
     private final String name;
     protected int scope;
@@ -32,5 +32,10 @@ public abstract class AbstractDefinition extends ASTAbstractNode implements Defi
     @Override
     public void setScope(int scope) {
         this.scope = scope;
+    }
+
+    @Override
+    public void setDefinition(FuncDefinition definition) {
+
     }
 }

@@ -46,8 +46,9 @@ public class CharType extends AbstractType {
             return this;
         } else if (type instanceof IntType){
             return new IntType(this.getLine(), this.getColumn());
-        }
-        else if (type instanceof ErrorType){
+        } else if (type instanceof DoubleType){
+            return new DoubleType(this.getLine(), this.getColumn());
+        } else if (type instanceof ErrorType){
             return type;
         } else {
             ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Cast operation between different types");
@@ -67,6 +68,11 @@ public class CharType extends AbstractType {
             ErrorHandler.getInstance().addError(error);
             return error;
         }
+    }
+
+    @Override
+    public boolean isSimpleType(){
+        return true;
     }
 
     @Override

@@ -13,9 +13,12 @@ public class AddressCGVisitor<TP, TR> extends AbstractCGVisitor<TP,TR> {
 
     ValueCGVisitor<TP,TR> valueCGVisitor;
 
-    public AddressCGVisitor(CodeGenerator codeGenerator, ValueCGVisitor<TP,TR> valueCGVisitor){
+    public AddressCGVisitor(CodeGenerator codeGenerator){
         this.codeGenerator = codeGenerator;
-        this.valueCGVisitor = valueCGVisitor;
+    }
+
+    public void setValueCGVisitor(ValueCGVisitor<TP, TR> value) {
+        this.valueCGVisitor = value;
     }
 
     /**

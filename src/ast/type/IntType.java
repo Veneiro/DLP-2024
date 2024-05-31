@@ -106,4 +106,9 @@ public class IntType extends AbstractType {
     public char suffix() {
         return 'i';
     }
+
+    @Override
+    public boolean isSimpleType(){
+        return true;
+    }
 }

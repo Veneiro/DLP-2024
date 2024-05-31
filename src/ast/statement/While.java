@@ -6,7 +6,7 @@ import ast.visitor.Visitor;
 
 import java.util.List;
 
-public class While extends ASTAbstractNode implements Statement {
+public class While extends AbstractStatement {
     public List<Statement> while_statement;
     public Expression while_expression;
 

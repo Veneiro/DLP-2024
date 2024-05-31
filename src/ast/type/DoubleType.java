@@ -35,6 +35,10 @@ public class DoubleType extends AbstractType {
     public Type castTo(Type type) {
         if(this.getClass() == type.getClass()){
             return this;
+        } else if (type instanceof IntType){
+            return new IntType(this.getLine(), this.getColumn());
+        } else if (type instanceof CharType){
+            return new CharType(this.getLine(), this.getColumn());
         } else if (type instanceof ErrorType){
             return type;
         } else {
@@ -75,5 +79,10 @@ public class DoubleType extends AbstractType {
     @Override
     public char suffix() {
         return 'f';
+    }
+
+    @Override
+    public boolean isSimpleType(){
+        return true;
     }
 }

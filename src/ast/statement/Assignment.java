@@ -4,7 +4,7 @@ import ast.ASTAbstractNode;
 import ast.expression.Expression;
 import ast.visitor.Visitor;
 
-public class Assignment extends ASTAbstractNode implements Statement {
+public class Assignment extends AbstractStatement {
     public Expression assign_to;
     public Expression to_assign;
 

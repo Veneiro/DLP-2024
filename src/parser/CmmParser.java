@@ -456,8 +456,8 @@ public class CmmParser extends Parser {
 						}
 						setState(101);
 						((ExpressionContext)_localctx).exp_right = expression(4);
-						 ((ExpressionContext)_localctx).ast =  new Logical(((ExpressionContext)_localctx).exp_left.ast.getLine(), ((ExpressionContext)_localctx).exp_left.ast.getColumn(),
-						                          ((ExpressionContext)_localctx).exp_left.ast, (((ExpressionContext)_localctx).OP!=null?((ExpressionContext)_localctx).OP.getText():null), ((ExpressionContext)_localctx).exp_right.ast); 
+						 ((ExpressionContext)_localctx).ast =  new Comparision(((ExpressionContext)_localctx).exp_left.ast.getLine(), ((ExpressionContext)_localctx).exp_left.ast.getColumn(),
+						                          (((ExpressionContext)_localctx).OP!=null?((ExpressionContext)_localctx).OP.getText():null), ((ExpressionContext)_localctx).exp_left.ast, ((ExpressionContext)_localctx).exp_right.ast); 
 						}
 						break;
 					case 4:

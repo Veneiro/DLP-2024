@@ -39,7 +39,7 @@ public class LexerHelper {
 
 	public static Double lexemeToReal(String str){
 		try {
-			Double.parseDouble(str);
+			return Double.parseDouble(str);
 		} catch (Exception e){
 			System.out.println(e);
 		}

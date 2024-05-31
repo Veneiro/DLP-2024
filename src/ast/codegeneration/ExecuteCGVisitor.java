@@ -1,20 +1,29 @@
 package ast.codegeneration;
 
-import ast.statement.Read;
-import ast.statement.Write;
+import ast.program.FuncDefinition;
+import ast.program.Program;
+import ast.program.VarDefinition;
+import ast.statement.*;
+import ast.type.FunctionType;
 import ast.visitor.AbstractVisitor;
 
 public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
 
     private AddressCGVisitor<TP,TR> addressCGVisitor;
+    private ValueCGVisitor<TP,TR> valueCGVisitor;
     private CodeGenerator codeGenerator;
+    private String source;
 
-    public ExecuteCGVisitor(CodeGenerator codeGenerator) {
+    public ExecuteCGVisitor(CodeGenerator codeGenerator, String source) {
+        this.source = source;
         this.codeGenerator = codeGenerator;
     }
 
     public void setAddressCGVisitor(AddressCGVisitor<TP,TR> addressCGVisitor) {
         this.addressCGVisitor = addressCGVisitor;
+    }
+    public void setValueCGVisitor(ValueCGVisitor<TP, TR> value) {
+        this.valueCGVisitor = value;
     }
 
     /**
@@ -25,8 +34,11 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      */
     @Override
     public TR visit(Read read, TP param) {
+        codeGenerator.line(read.getLine());
+
         read.to_read.accept(addressCGVisitor, param);
         codeGenerator.in(read.to_read.getType());
+        codeGenerator.store(read.to_read.getType());
 
         return null;
     }
@@ -38,7 +50,9 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      */
     @Override
     public TR visit(Write write, TP param){
-        write.toWrite.accept(addressCGVisitor, param);
+        codeGenerator.line(write.getLine());
+
+        write.toWrite.accept(valueCGVisitor, param);
         codeGenerator.outW(write.toWrite.getType());
         return null;
     }
@@ -50,6 +64,16 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      *      expression2.type.convertTo(expression1.type)
      *      <store> expression1.type.suffix()
      */
+    @Override
+    public TR visit(Assignment assignment, TP param){
+        codeGenerator.line(assignment.getLine());
+
+        assignment.assign_to.accept(addressCGVisitor, param);
+        assignment.to_assign.accept(valueCGVisitor, param);
+        codeGenerator.convert(assignment.to_assign.getType(), assignment.assign_to.getType());
+        codeGenerator.store(assignment.assign_to.getType());
+        return null;
+    }
 
      /**
      *   execute[[FunctionDefinition: definition -> type name statements*]]=
@@ -58,12 +82,42 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      *      execute[[statements]]
      *      ret getReturnType().numberOfBytes(), type.numberOfBytesInParams(), functionDefinition.numberOfBytesInLocalVars()
      */
-     /**
+    @Override
+    public TR visit(FuncDefinition funcDefinition, TP param) {
+        codeGenerator.line(funcDefinition.getLine());
+
+        int localSize = funcDefinition.statements.stream()
+                .filter(s -> s instanceof VarDefinition)
+                .mapToInt(s -> ((VarDefinition)s).getType().numberOfBytes())
+                .sum();
+        int paramSize = ((FunctionType) funcDefinition.getType()).definitions.stream()
+                .mapToInt(s -> ((VarDefinition)s).getType().numberOfBytes())
+                .sum();
+        int returnSize = 0;
+        if (((FunctionType) funcDefinition.getType()).return_type != null) {
+            returnSize = ((FunctionType) funcDefinition.getType()).return_type.numberOfBytes();
+        }
+
+        codeGenerator.label(funcDefinition.getName());
+        codeGenerator.enter(localSize);
+        funcDefinition.statements.forEach(s -> s.accept(this, param));
+        codeGenerator.ret(returnSize, paramSize, localSize);
+        return null;
+    }
+    /**
      *   execute[[Program -> definitions*]]=
      *      <call> main
      *      <halt>
      *      execute[[definitions]]
      */
+    @Override
+    public TR visit(Program program, TP param) {
+        codeGenerator.source(source);
+        codeGenerator.call("main");
+        codeGenerator.halt();
+        program.definitions.forEach(d -> d.accept(this,param));
+        return null;
+    }
 
     /**
      * execute[[While: statement -> expression statement*]]
@@ -76,6 +130,23 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      *          <jmp > condLabel
      *      exitLabel<:>
      */
+
+    @Override
+    public TR visit(While w, TP param){
+        codeGenerator.line(w.getLine());
+
+        String condLabel = codeGenerator.nextLabel();
+        String exitLabel = codeGenerator.nextLabel();
+
+        codeGenerator.label(condLabel);
+        w.while_expression.accept(valueCGVisitor, param);
+        codeGenerator.jz(exitLabel);
+        w.while_statement.forEach(s -> s.accept(this, param));
+        codeGenerator.jmp(condLabel);
+        codeGenerator.label(exitLabel);
+
+        return null;
+    }
     /**
      * execute[[IfElseStmt: statement -> expression statement*]]
      *      String elseLabel = cg.nextLabel(),
@@ -88,4 +159,43 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      *          statement*.forEach(stmt -> execute[[stmt]])
      *      exitLabel<:>
      */
+    @Override
+    public TR visit(IfElse ifElse, TP param){
+        codeGenerator.line(ifElse.getLine());
+
+        String elseLabel = codeGenerator.nextLabel();
+        String exitLabel = codeGenerator.nextLabel();
+
+        ifElse.expr.accept(valueCGVisitor, param);
+
+        codeGenerator.jz(elseLabel);
+        ifElse.if_statement.forEach(s -> s.accept(this, param));
+        codeGenerator.jmp(exitLabel);
+        codeGenerator.label(elseLabel);
+        ifElse.else_statement.forEach(s -> s.accept(this, param));
+        codeGenerator.label(exitLabel);
+        return null;
+    }
+
+    /**
+     * execute[[Return: statement -> exp]] (int bytesReturn, int bytesLocals, int bytesArgs) =
+     * value[[exp]]
+     * <ret > bytesReturn <, > bytesLocals <, > bytesArgs
+     */
+    @Override
+    public TR visit(Return ret, TP param){
+        int localSize = ret.getDefinition().statements.stream()
+                .filter(s -> s instanceof VarDefinition)
+                .mapToInt(s -> ((VarDefinition)s).getType().numberOfBytes())
+                .sum();
+        int paramSize = ((FunctionType) ret.getDefinition().getType()).definitions.stream()
+                .mapToInt(s -> ((VarDefinition)s).getType().numberOfBytes())
+                .sum();
+        int returnSize = 0;
+        if (((FunctionType) ret.getDefinition().getType()).return_type != null) {
+            returnSize = ((FunctionType) ret.getDefinition().getType()).return_type.numberOfBytes();
+        }
+        codeGenerator.ret(returnSize, paramSize, localSize);
+        return null;
+    }
 }

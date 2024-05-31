@@ -6,7 +6,7 @@ import ast.visitor.Visitor;
 
 import java.util.List;
 
-public class IfElse extends ASTAbstractNode implements Statement {
+public class IfElse extends AbstractStatement {
     public List<Statement> if_statement;
     public List<Statement> else_statement;
     public Expression expr;

@@ -6,7 +6,7 @@ import ast.visitor.Visitor;
 
 import java.util.List;
 
-public class Write extends ASTAbstractNode implements Statement {
+public class Write extends AbstractStatement {
     public Expression toWrite;
 
     public Write(int line, int column, Expression toWrite) {

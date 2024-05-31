@@ -7,7 +7,7 @@ import ast.visitor.Visitor;
 
 import java.util.List;
 
-public class FunctionInvocation extends ASTAbstractNode implements Statement {
+public class FunctionInvocation extends AbstractStatement {
     public List<Expression> expressions;
     public Variable variable;
 

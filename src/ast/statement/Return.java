@@ -4,7 +4,7 @@ import ast.ASTAbstractNode;
 import ast.expression.Expression;
 import ast.visitor.Visitor;
 
-public class Return extends ASTAbstractNode implements Statement {
+public class Return extends AbstractStatement {
     public Expression to_return;
 
     public Return(int line, int column, Expression retExpr) {

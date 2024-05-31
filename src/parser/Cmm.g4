@@ -62,8 +62,8 @@ expression returns [Expression ast]:
             { $ast = new Arithmetic($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
                 $exp_left.ast, $OP.text, $exp_right.ast); }
         | exp_left=expression OP=('<' | '>' | '<=' | '>=' | '==' | '!=') exp_right=expression
-            { $ast = new Logical($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
-                $exp_left.ast, $OP.text, $exp_right.ast); }
+            { $ast = new Comparision($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
+                $OP.text, $exp_left.ast, $exp_right.ast); }
         | exp_left=expression OP=('&&' | '||') exp_right=expression
             { $ast = new Logical($exp_left.ast.getLine(), $exp_left.ast.getColumn(),
                 $exp_left.ast, $OP.text, $exp_right.ast); }

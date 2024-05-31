@@ -29,4 +29,6 @@ public interface Type extends ASTNode {
     boolean mustBeSubtype(Type param);
 
     char suffix();
+
+    boolean isSimpleType();
 }

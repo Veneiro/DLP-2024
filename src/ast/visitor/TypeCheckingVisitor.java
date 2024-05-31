@@ -17,6 +17,7 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      */
     @Override
     public TR visit(FuncDefinition functionDefinition, TP param) {
+        functionDefinition.statements.forEach(statement -> statement.setDefinition(functionDefinition));
         functionDefinition.statements.forEach(stmt -> stmt.accept(this, null));
         functionDefinition.getType().accept(this, null);
         if(((FunctionType)functionDefinition.getType()).return_type == null) {
@@ -37,11 +38,23 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      * (P) FuncInvocation: statement -> expression expression*
      * (R) expression.type.parenthesis(expression*.stream().map(exp -> exp.type).toArray())
      */
+     @Override
+     public TR visit(FunctionInvocation functionInvocation, TP param){
+         functionInvocation.expressions.forEach(expr -> expr.accept(this, null));
+         functionInvocation.variable.getType().parenthesis((functionInvocation.expressions.stream().map(args -> args.getType())).toList());
+         return null;
+     }
 
      /** STATEMENTS
      * (P) Write: statement -> expression
      * (R) expression.type.isSimpleType()
      */
+     @Override
+     public TR visit(Write write, TP param){
+         write.toWrite.accept(this, null);
+         write.toWrite.getType().isSimpleType();
+         return null;
+     }
 
      /**
      * (P) WhileStmt: statement1 -> expression statement2*
@@ -72,13 +85,25 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      @Override
      public TR visit(Return aReturn, TP param) {
          super.visit(aReturn, null);
-         if(!(param == null)) {
-             new ErrorType(
-                     aReturn.getLine(),
-                     aReturn.getColumn(),
-                     String.format("Return statement is returning " +
-                             "an expression of type %s that is not a " +
-                             "subtype of the return type %s", aReturn.to_return.getType(), param));
+
+         FuncDefinition funcDef = aReturn.getDefinition();
+         FunctionType funcType = (FunctionType) funcDef.getType();
+
+         if (funcType.return_type != null ) {
+             if (aReturn.to_return != null) {
+                 // Comprueba que el tipo de la izquierda sea igual al de la derecha
+                 if (!aReturn.to_return.getType().promotesTo(funcType.return_type)) {
+                     new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Tipo de retorno no coincide");
+                 }
+             }
+             else {
+                 new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Falta expresión de retorno");
+             }
+         }
+         else {
+             if (aReturn.to_return != null) {
+                 new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Retorno en función void tiene expresion de retorno");
+             }
          }
          return null;
      }

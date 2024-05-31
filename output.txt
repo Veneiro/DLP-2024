@@ -1,0 +1,30 @@
+#source "input.txt"
+call main
+halt
+#line 1
+main:
+enter 9
+#line 4
+push bp
+pushi -9
+addi
+pushb 97
+storeb
+#line 5
+push bp
+pushi -4
+addi
+push bp
+pushi -9
+addi
+loadb
+b2i
+i2f
+storef
+#line 6
+push bp
+pushi -4
+addi
+loadf
+outf
+ret 0, 9, 0

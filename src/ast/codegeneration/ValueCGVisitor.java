@@ -1,20 +1,20 @@
 package ast.codegeneration;
 
-import ast.expression.CharLiteral;
-import ast.expression.IntLiteral;
-import ast.expression.RealLiteral;
-import ast.expression.Variable;
-import ast.type.IntType;
+import ast.expression.*;
+import ast.type.Type;
 import ast.visitor.AbstractVisitor;
 
 public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
     private CodeGenerator codeGenerator;
-    private AddressCGVisitor<TP,TR> addressCGVisitor
+    private AddressCGVisitor<TP,TR> addressCGVisitor;
 
-    public ValueCGVisitor(CodeGenerator codeGenerator, AddressCGVisitor<TP,TR> addressCGVisitor){
+    public ValueCGVisitor(CodeGenerator codeGenerator){
         this.codeGenerator = codeGenerator;
-        this.addressCGVisitor = addressCGVisitor;
+    }
+
+    public void setAddressCGVisitor(AddressCGVisitor<TP, TR> address) {
+        this.addressCGVisitor = address;
     }
 
     /**
@@ -51,7 +51,7 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      *     <load> expression.type.suffix()
      */
     public TR visit(Variable variable, TP param){
-        variable.varDefinition.accept(addressCGVisitor, null);
+        variable.accept(addressCGVisitor, null);
         codeGenerator.load(variable.getType());
         return null;
     }
@@ -80,6 +80,35 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      *              break;
      *      }
      */
+    @Override
+    public TR visit(Arithmetic arithmetic, TP param){
+        arithmetic.first_expression.accept(this, param);
+        codeGenerator.convert(arithmetic.getType(), arithmetic.first_expression.getType());
+        arithmetic.second_expression.accept(this, param);
+        codeGenerator.convert(arithmetic.getType(), arithmetic.second_expression.getType());
+
+        switch(arithmetic.operator){
+            case "+":
+                codeGenerator.add(arithmetic.getType());
+                break;
+            case "-":
+                codeGenerator.sub(arithmetic.getType());
+                break;
+            case "*":
+                codeGenerator.mul(arithmetic.getType());
+                break;
+            case "/":
+                codeGenerator.div(arithmetic.getType());
+                break;
+            case "%":
+                codeGenerator.mod(arithmetic.getType());
+                break;
+            default:
+                assert false;
+        }
+        return null;
+    }
+
 
     /**
      *  value[[Comparison: expression1 -> expression2 expression3]]=
@@ -87,7 +116,7 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      *      value[[expression2]]
      *      expression2.type.convertTo(superType)
      *      value[[expression3]]
-     *      expression3.type.convertTo(expression1.type)
+     *      expression3.type.convertTo(superType)
      *      switch(){
      *          case '==':
      *              <eqi> expression1.type.suffix()
@@ -107,6 +136,38 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      *          default: assert false;
      */
 
+    @Override
+    public TR visit(Comparision comparision, TP param){
+        Type superType = codeGenerator.superType(comparision.first_to_compare.getType(),
+                comparision.second_to_compare.getType());
+
+        comparision.first_to_compare.accept(this, param);
+        codeGenerator.convert(comparision.first_to_compare.getType(), superType);
+
+        comparision.second_to_compare.accept(this, param);
+        codeGenerator.convert(comparision.second_to_compare.getType(), superType);
+
+        switch(comparision.operator){
+            case "==":
+               codeGenerator.eq(superType);
+               break;
+            case "<":
+               codeGenerator.lt(superType);
+               break;
+            case ">":
+                codeGenerator.gt(superType);
+                break;
+            case "<=":
+                codeGenerator.le(superType);
+               break;
+            case ">=":
+                codeGenerator.ge(superType);
+                break;
+            default: assert false;
+        }
+        return null;
+    }
+
     /**
      *  value[[Logical: expression1 -> expression2 expression3]]=
      *      value[[expression2]]
@@ -122,22 +183,59 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      *              break;
      *          default: assert false;
      */
+    @Override
+    public TR visit(Logical logical, TP param){
+        logical.first_expression.accept(this, param);
+        codeGenerator.convert(logical.first_expression.getType(), logical.getType());
+        logical.second_expression.accept(this, param);
+        codeGenerator.convert(logical.second_expression.getType(), logical.getType());
+
+        switch(logical.operator){
+            case "&&":
+                codeGenerator.and(logical.getType());
+                break;
+            case "||":
+                codeGenerator.or(logical.getType());
+                break;
+            default:
+                assert false;
+        }
+        return null;
+    }
 
     /**
      *  value[[Cast: expression1 -> type expression2]]=
      *          value[[expression2]]
      *          expression2.type.convertTo(type)
      */
+    @Override
+    public TR visit(Cast cast, TP param){
+        cast.toCast.accept(this, param);
+        codeGenerator.convert(cast.toCast.getType(), cast.castType);
+        return null;
+    }
 
     /**
      *  value[[Indexing: expression1 -> expression2 expression3
      *  address[[expression1]]
      *  <load> expression1.type.suffix()
      */
+    @Override
+    public TR visit(Indexing indexing, TP param){
+        indexing.accept(addressCGVisitor, param);
+        codeGenerator.load(indexing.getType());
+        return null;
+    }
 
      /**
      *  value[[FieldAccess: expression1 -> expression2 ID
      *  address[[expression1]]
      *  <load> expression1.type.suffix()
      */
+     @Override
+    public TR visit(FieldAccess fieldAccess, TP param){
+        fieldAccess.accept(addressCGVisitor, param);
+        codeGenerator.load(fieldAccess.getType());
+        return null;
+    }
 }

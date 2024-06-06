@@ -1,7 +1,7 @@
 package ast.type;
 
-import ast.ASTAbstractNode;
 import ast.errorhandler.ErrorHandler;
+import ast.program.Field;
 import ast.visitor.Visitor;
 
 import java.util.List;
@@ -20,13 +20,13 @@ public class StructType extends AbstractType {
     }
 
     @Override
-    public Type fieldAccess(String name) {
+    public Type fieldAccess(String name/*, ASTNode node*/) {
         for (Field field : struct_fields) {
-            if (field.name.equals(name)) {
-                return field.field_type;
+            if (field.getName().equals(name)) {
+                return field.getType();
             }
         }
-        ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Field not found in struct");
+        ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Field not found in struct");
         ErrorHandler.getInstance().addError(error);
         return error;
     }
@@ -35,7 +35,7 @@ public class StructType extends AbstractType {
     public int numberOfBytes() {
         int bytes = 0;
         for (Field field : struct_fields) {
-            bytes += field.field_type.numberOfBytes();
+            bytes += field.getType().numberOfBytes();
         }
         return bytes;
     }

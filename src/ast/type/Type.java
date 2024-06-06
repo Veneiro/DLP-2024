@@ -31,4 +31,8 @@ public interface Type extends ASTNode {
     char suffix();
 
     boolean isSimpleType();
+
+    boolean promotesTo(Type returnType);
+
+    boolean isLogical();
 }

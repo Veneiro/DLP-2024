@@ -1,20 +1,15 @@
-package ast.type;
+package ast.program;
 
-import ast.ASTAbstractNode;
-import ast.errorhandler.ErrorHandler;
+import ast.type.Type;
 import ast.visitor.Visitor;
 
 import java.util.Objects;
 
-public class Field extends AbstractType {
-    public Type field_type;
-    public String name;
+public class Field extends AbstractDefinition {
     public int offset;
 
     public Field(int line, int column, String name, Type fieldType) {
-        super(line, column);
-        this.name = name;
-        this.field_type = fieldType;
+        super(line, column, fieldType, name);
     }
 
     @Override
@@ -22,12 +17,12 @@ public class Field extends AbstractType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Field field = (Field) o;
-        return Objects.equals(name, field.name);
+        return Objects.equals(getName(), field.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(getName());
     }
 
     @Override
@@ -35,10 +30,6 @@ public class Field extends AbstractType {
         return visitor.visit(this, param);
     }
 
-    @Override
-    public int numberOfBytes() {
-        return field_type.numberOfBytes();
-    }
     public int getOffset() {
         return offset;
     }

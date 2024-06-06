@@ -95,9 +95,17 @@ public abstract class AbstractType extends ASTAbstractNode implements Type {
         assert false;
         return ' ';
     }
-
     @Override
     public boolean isSimpleType(){
+        return false;
+    }
+    @Override
+    public boolean promotesTo(Type returnType){
+        return false;
+    }
+
+    @Override
+    public boolean isLogical(){
         return false;
     }
 }

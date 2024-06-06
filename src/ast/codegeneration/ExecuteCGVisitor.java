@@ -1,5 +1,6 @@
 package ast.codegeneration;
 
+import ast.expression.FuncInvocation;
 import ast.program.FuncDefinition;
 import ast.program.Program;
 import ast.program.VarDefinition;
@@ -101,7 +102,6 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
         codeGenerator.label(funcDefinition.getName());
         codeGenerator.enter(localSize);
         funcDefinition.statements.forEach(s -> s.accept(this, param));
-        codeGenerator.ret(returnSize, paramSize, localSize);
         return null;
     }
     /**
@@ -184,6 +184,8 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      */
     @Override
     public TR visit(Return ret, TP param){
+        codeGenerator.line(ret.getLine());
+        ret.to_return.accept(valueCGVisitor, param);
         int localSize = ret.getDefinition().statements.stream()
                 .filter(s -> s instanceof VarDefinition)
                 .mapToInt(s -> ((VarDefinition)s).getType().numberOfBytes())
@@ -196,6 +198,21 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
             returnSize = ((FunctionType) ret.getDefinition().getType()).return_type.numberOfBytes();
         }
         codeGenerator.ret(returnSize, paramSize, localSize);
+        return null;
+    }
+
+    @Override
+    public TR visit(FuncInvocation funcInvocation, TP param) {
+
+        funcInvocation.expressions.forEach(e -> e.accept(valueCGVisitor, param));
+
+        codeGenerator.call(funcInvocation.variable.name);
+
+        FunctionType type = (FunctionType) funcInvocation.variable.getType();
+        if (type.return_type != null) {
+            codeGenerator.pop(type.return_type.suffix());
+        }
+
         return null;
     }
 }

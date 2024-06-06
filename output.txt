@@ -1,30 +1,575 @@
 #source "input.txt"
 call main
 halt
-#line 1
-main:
-enter 9
-#line 4
-push bp
-pushi -9
-addi
-pushb 97
-storeb
-#line 5
+#line 14
+p:
+enter 0
+#line 16
+f:
+enter 7
+#line 20
 push bp
 pushi -4
 addi
 push bp
-pushi -9
+pushi 6
+addi
+loadf
+pushf 10.0
+mulf
+storef
+#line 21
+push bp
+pushi -5
+addi
+pushb 48
+storeb
+#line 22
+push bp
+pushi 4
+addi
+loadi
+pushi 256
+lti
+jz _1
+#line 23
+push bp
+pushi -5
+addi
+push bp
+pushi 4
+addi
+loadi
+i2b
+storeb
+#line 24
+push bp
+pushi -7
+addi
+push bp
+pushi -5
 addi
 loadb
 b2i
-i2f
-storef
-#line 6
+storei
+jmp _2
+_1:
+#line 27
+push bp
+pushi -7
+addi
 push bp
 pushi -4
 addi
 loadf
-outf
-ret 0, 9, 0
+f2i
+storei
+_2:
+#line 28
+push bp
+pushi -7
+addi
+loadi
+ret 2, 7, 6
+#line 31
+initialize:
+enter 2
+#line 33
+pusha 11
+pushi 0
+pushi 6
+muli
+addi
+pushi 0
+pushi 2
+muli
+addi
+pushi 0
+storei
+#line 34
+pusha 11
+pushi 0
+pushi 6
+muli
+addi
+pushi 1
+pushi 2
+muli
+addi
+pushi 1
+storei
+#line 35
+pusha 11
+pushi 0
+pushi 6
+muli
+addi
+pushi 2
+pushi 2
+muli
+addi
+pushi 1
+storei
+#line 36
+push bp
+pushi -2
+addi
+pushi 1
+storei
+#line 37
+_3:
+push bp
+pushi -2
+addi
+loadi
+pushi 8
+lti
+jz _4
+#line 38
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 0
+pushi 2
+muli
+addi
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+subi
+pushi 6
+muli
+addi
+pushi 1
+pushi 2
+muli
+addi
+loadi
+storei
+#line 39
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 1
+pushi 2
+muli
+addi
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+subi
+pushi 6
+muli
+addi
+pushi 2
+pushi 2
+muli
+addi
+loadi
+storei
+#line 40
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 2
+pushi 2
+muli
+addi
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 0
+pushi 2
+muli
+addi
+loadi
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 1
+pushi 2
+muli
+addi
+loadi
+addi
+storei
+#line 41
+push bp
+pushi -2
+addi
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _3
+_4:
+#line 47
+main:
+enter 4
+#line 50
+push bp
+pushi -2
+addi
+pushi 0
+storei
+#line 51
+pusha 0
+pushi 1
+addi
+pushb 48
+storeb
+#line 52
+pusha 0
+pushi 2
+addi
+pushb 48
+b2i
+storei
+#line 55
+push bp
+pushi -2
+addi
+loadi
+i2f
+pusha 0
+pushi 1
+addi
+loadb
+b2i
+call f
+outi
+#line 55
+pushb 10
+outb
+#line 59
+push bp
+pushi -2
+addi
+pushi 0
+storei
+#line 60
+_5:
+push bp
+pushi -2
+addi
+loadi
+pushi 8
+lti
+jz _6
+#line 62
+pushb 40
+outb
+#line 62
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+addi
+outi
+#line 62
+pushb 41
+outb
+#line 62
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 0
+pushi 2
+muli
+addi
+loadi
+outi
+#line 62
+pushb 43
+outb
+#line 62
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 1
+pushi 2
+muli
+addi
+loadi
+outi
+#line 62
+pushb 61
+outb
+#line 62
+pusha 11
+push bp
+pushi -2
+addi
+loadi
+pushi 6
+muli
+addi
+pushi 2
+pushi 2
+muli
+addi
+loadi
+outi
+#line 62
+pushb 10
+outb
+#line 65
+push bp
+pushi -2
+addi
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _5
+_6:
+#line 68
+pusha 3
+pushi 1
+pushi 4
+muli
+addi
+pushi 4
+addi
+pushi 1
+pushi 2
+muli
+addi
+pushi 2
+addi
+pushi 56
+storei
+#line 70
+pusha 3
+pushi 1
+pushi 4
+muli
+addi
+pushi 4
+addi
+pushi 1
+pushi 2
+muli
+addi
+pushi 2
+addi
+loadi
+outi
+#line 70
+pushb 10
+outb
+#line 71
+push bp
+pushi -2
+addi
+pushi 0
+storei
+#line 72
+_7:
+push bp
+pushi -2
+addi
+loadi
+pushi 2
+lti
+jz _8
+#line 73
+push bp
+pushi -4
+addi
+pushi 0
+storei
+#line 74
+_9:
+push bp
+pushi -4
+addi
+loadi
+pushi 2
+lti
+jz _10
+#line 75
+pusha 3
+push bp
+pushi -2
+addi
+loadi
+pushi 4
+muli
+addi
+pushi 4
+addi
+push bp
+pushi -4
+addi
+loadi
+pushi 2
+muli
+addi
+pushi 2
+addi
+push bp
+pushi -2
+addi
+loadi
+push bp
+pushi -4
+addi
+loadi
+addi
+storei
+#line 76
+push bp
+pushi -4
+addi
+push bp
+pushi -4
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _9
+_10:
+#line 78
+push bp
+pushi -2
+addi
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _7
+_8:
+#line 82
+push bp
+pushi -2
+addi
+pushi 0
+storei
+#line 83
+_11:
+push bp
+pushi -2
+addi
+loadi
+pushi 2
+lti
+jz _12
+#line 84
+push bp
+pushi -4
+addi
+pushi 0
+storei
+#line 85
+_13:
+push bp
+pushi -4
+addi
+loadi
+pushi 2
+lti
+jz _14
+#line 87
+pusha 3
+push bp
+pushi -2
+addi
+loadi
+pushi 4
+muli
+addi
+pushi 4
+addi
+push bp
+pushi -4
+addi
+loadi
+pushi 2
+muli
+addi
+pushi 2
+addi
+loadi
+outi
+#line 87
+pushb 32
+outb
+#line 88
+push bp
+pushi -4
+addi
+push bp
+pushi -4
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _13
+_14:
+#line 90
+push bp
+pushi -2
+addi
+push bp
+pushi -2
+addi
+loadi
+pushi 1
+addi
+storei
+jmp _11
+_12:

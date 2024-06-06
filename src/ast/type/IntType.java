@@ -22,7 +22,7 @@ public class IntType extends AbstractType {
         } else if (type instanceof ErrorType){
             return type;
         } else {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Arithmetic operation between different types");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Arithmetic operation between different types");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
@@ -39,7 +39,7 @@ public class IntType extends AbstractType {
         } else if (type instanceof ErrorType){
             return type;
         } else {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Cast operation between different types");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Cast operation between different types");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
@@ -52,7 +52,7 @@ public class IntType extends AbstractType {
         } else if (type instanceof ErrorType){
             return type;
         } else {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Comparison operation between different types");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Comparison operation between different types");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
@@ -65,7 +65,7 @@ public class IntType extends AbstractType {
         } else if (type instanceof ErrorType){
             return type;
         } else {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Logical operation between different types");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Logical operation between different types");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
@@ -78,7 +78,7 @@ public class IntType extends AbstractType {
         } else if (type instanceof ErrorType){
             return type;
         } else {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Modulus operation between different types");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Modulus operation between different types");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
@@ -109,6 +109,19 @@ public class IntType extends AbstractType {
 
     @Override
     public boolean isSimpleType(){
+        return true;
+    }
+
+    @Override
+    public boolean promotesTo(Type returnType){
+        if(returnType instanceof IntType){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isLogical(){
         return true;
     }
 }

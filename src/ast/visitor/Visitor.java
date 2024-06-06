@@ -1,6 +1,7 @@
 package ast.visitor;
 
 import ast.expression.*;
+import ast.program.Field;
 import ast.program.FuncDefinition;
 import ast.program.Program;
 import ast.program.VarDefinition;

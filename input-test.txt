@@ -1,0 +1,8 @@
+void main() {
+    double x,y;
+    char z;
+    z = 'a';
+    x = (double)z;
+    write x;
+}
+	

@@ -6,8 +6,9 @@ import ast.program.Definition;
 import ast.program.FuncDefinition;
 import ast.program.VarDefinition;
 import ast.semantic.SymbolTable;
-import ast.statement.Statement;
 import ast.type.ErrorType;
+import ast.program.Field;
+import ast.type.StructType;
 
 public class IdentificationVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
 
@@ -57,6 +58,26 @@ public class IdentificationVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
         funcDefinition.getType().accept(this, null);
         funcDefinition.statements.forEach(s -> s.accept(this, null));
         table.reset();
+        return null;
+    }
+
+    @Override
+    public TR visit(StructType structType, TP param) {
+        table.set();
+        structType.struct_fields.forEach(sf -> sf.accept(this, param));
+        table.reset();
+        return null;
+    }
+
+    @Override
+    public TR visit(Field field, TP param) {
+        if (!table.insert(field)) {
+            ErrorType error = new ErrorType(
+                    field.getLine(),
+                    field.getColumn(),
+                    String.format("Repeated field definition for '%s'", field.getName()));
+            ErrorHandler.getInstance().addError(error);
+        }
         return null;
     }
 }

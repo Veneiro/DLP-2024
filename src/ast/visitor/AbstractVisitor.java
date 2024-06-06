@@ -1,6 +1,7 @@
 package ast.visitor;
 
 import ast.expression.*;
+import ast.program.Field;
 import ast.program.FuncDefinition;
 import ast.program.Program;
 import ast.program.VarDefinition;
@@ -178,7 +179,7 @@ public class AbstractVisitor<TP, TR> implements Visitor<TP, TR> {
 
     @Override
     public TR visit(Field field, TP param) {
-        field.field_type.accept(this, null);
+        field.getType().accept(this, null);
         return null;
     }
 

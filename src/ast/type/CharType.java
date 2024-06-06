@@ -94,4 +94,12 @@ public class CharType extends AbstractType {
     public char suffix() {
         return 'b';
     }
+
+    @Override
+    public boolean promotesTo(Type returnType){
+        if(returnType instanceof CharType){
+            return true;
+        }
+        return false;
+    }
 }

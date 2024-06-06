@@ -30,7 +30,7 @@ public class FuncDefinition extends AbstractDefinition {
 
     @Override
     public int getOffset() {
-        throw new RuntimeException("Los tipos de funcion no tienen offset");
+        throw new RuntimeException("Function types does not have offset");
     }
 
     @Override

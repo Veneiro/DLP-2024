@@ -25,13 +25,13 @@ public class FunctionType extends AbstractType {
     @Override
     public Type parenthesis(List<Type> types) {
         if (types.size() != definitions.size()) {
-            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Number of parameters does not match");
+            ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Number of parameters does not match");
             ErrorHandler.getInstance().addError(error);
             return error;
         }
         for (int i = 0; i < types.size(); i++) {
-            if (!types.get(i).equals(definitions.get(i).getType())) {
-                ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "ERROR: Parameter type does not match");
+            if (!types.get(i).promotesTo(definitions.get(i).getType())) {
+                ErrorType error = new ErrorType(this.getLine(), this.getColumn(), "Parameter type does not match");
                 ErrorHandler.getInstance().addError(error);
                 return error;
             }

@@ -85,4 +85,12 @@ public class DoubleType extends AbstractType {
     public boolean isSimpleType(){
         return true;
     }
+
+    @Override
+    public boolean promotesTo(Type returnType){
+        if(returnType instanceof DoubleType){
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,12 +1,8 @@
 package ast.visitor;
 
-import ast.expression.FieldAccess;
-import ast.expression.Variable;
-import ast.program.Definition;
 import ast.program.FuncDefinition;
-import ast.program.Program;
 import ast.program.VarDefinition;
-import ast.type.Field;
+import ast.program.Field;
 import ast.type.FunctionType;
 import ast.type.StructType;
 
@@ -35,7 +31,7 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
         int offset = 0;
         for(Field field : struct.struct_fields){
             field.setOffset(offset);
-            offset += field.numberOfBytes();
+            offset += field.getType().numberOfBytes();
         }
         return null;
     }

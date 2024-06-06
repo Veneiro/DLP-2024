@@ -41,6 +41,7 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      @Override
      public TR visit(FunctionInvocation functionInvocation, TP param){
          functionInvocation.expressions.forEach(expr -> expr.accept(this, null));
+         functionInvocation.variable.accept(this, null);
          functionInvocation.variable.getType().parenthesis((functionInvocation.expressions.stream().map(args -> args.getType())).toList());
          return null;
      }
@@ -52,7 +53,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      @Override
      public TR visit(Write write, TP param){
          write.toWrite.accept(this, null);
-         write.toWrite.getType().isSimpleType();
+         if(!write.toWrite.getType().isSimpleType()){
+             ErrorHandler.getInstance().addError(new ErrorType(write.toWrite.getLine(), write.toWrite.getColumn(), "Not a Simple Type"));
+         }
          return null;
      }
 
@@ -63,7 +66,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      @Override
      public TR visit(While aWhile, TP param) {
          super.visit(aWhile, null);
-         aWhile.while_expression.getType().logical(aWhile.while_expression.getType());
+         if(!aWhile.while_expression.getType().isLogical()){
+             ErrorHandler.getInstance().addError(new ErrorType(aWhile.while_expression.getLine(), aWhile.while_expression.getColumn(), "Expression must be a boolean"));
+         }
          return null;
      }
 
@@ -74,7 +79,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      @Override
      public TR visit(IfElse ifElse, TP param) {
          super.visit(ifElse, null);
-         ifElse.expr.getType().logical(ifElse.expr.getType());
+         if(!ifElse.expr.getType().isLogical()){
+             ErrorHandler.getInstance().addError(new ErrorType(ifElse.expr.getLine(), ifElse.expr.getColumn(), "Expression must be a boolean"));
+         }
          return null;
      }
 
@@ -89,20 +96,21 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
          FuncDefinition funcDef = aReturn.getDefinition();
          FunctionType funcType = (FunctionType) funcDef.getType();
 
-         if (funcType.return_type != null ) {
-             if (aReturn.to_return != null) {
-                 // Comprueba que el tipo de la izquierda sea igual al de la derecha
-                 if (!aReturn.to_return.getType().promotesTo(funcType.return_type)) {
-                     new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Tipo de retorno no coincide");
-                 }
+         if (funcType.return_type != null && aReturn.to_return != null) {
+             // Comprueba que el tipo de la izquierda sea igual al de la derecha
+             if (!aReturn.to_return.getType().promotesTo(funcType.return_type)) {
+                 ErrorHandler.getInstance().addError(
+                         new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Return type does not match function return type"));
              }
-             else {
-                 new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Falta expresión de retorno");
-             }
+         }
+         else if(funcType.return_type != null){
+             ErrorHandler.getInstance().addError(
+                     new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Missing return expression"));
          }
          else {
              if (aReturn.to_return != null) {
-                 new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Retorno en función void tiene expresion de retorno");
+                 ErrorHandler.getInstance().addError(
+                 new ErrorType(aReturn.getLine(), aReturn.getColumn(), "Void functions does not have a return statement"));
              }
          }
          return null;
@@ -313,6 +321,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
     public TR visit(Assignment assignment, TP param) {
         assignment.assign_to.accept(this, param);
         assignment.to_assign.accept(this, param);
+        if(!assignment.to_assign.getType().promotesTo(assignment.assign_to.getType())){
+            ErrorHandler.getInstance().addError(new ErrorType(assignment.getLine(), assignment.getColumn(), "Invalid Type Assignment"));
+        }
         if(!assignment.assign_to.getLValue()){
             ErrorType error = new ErrorType(assignment.assign_to.getLine(), assignment.assign_to.getColumn(),
                     "Wrong Lvalue for assignment");
@@ -330,13 +341,12 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      */
     @Override
     public TR visit(Read read, TP param) {
-        read.to_read.accept(this, null);
+        super.visit(read, param);
         if(!read.to_read.getLValue()){
             ErrorType error = new ErrorType(read.to_read.getLine(), read.to_read.getColumn(),
                     "Wrong Lvalue for read");
             ErrorHandler.getInstance().addError(error);
         }
-        super.visit(read, param);
         return null;
     }
 
@@ -353,7 +363,7 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
             e.accept(this, null);
         }
         funcInvocation.setLValue(false);
-        funcInvocation.setType(funcInvocation.getType().parenthesis(funcInvocation.expressions.stream().map(Expression::getType).collect(Collectors.toList())));
+        funcInvocation.setType(funcInvocation.variable.getType().parenthesis(funcInvocation.expressions.stream().map(Expression::getType).collect(Collectors.toList())));
     return null;
 }
 

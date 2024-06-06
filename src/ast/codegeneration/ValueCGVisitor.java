@@ -1,6 +1,7 @@
 package ast.codegeneration;
 
 import ast.expression.*;
+import ast.type.FunctionType;
 import ast.type.Type;
 import ast.visitor.AbstractVisitor;
 
@@ -238,4 +239,13 @@ public class ValueCGVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
         codeGenerator.load(fieldAccess.getType());
         return null;
     }
+
+    @Override
+    public TR visit(FuncInvocation funcInvocation, TP param) {
+
+        funcInvocation.expressions.forEach(e -> e.accept(this, param));
+        codeGenerator.call(funcInvocation.variable.name);
+        return null;
+    }
+
 }

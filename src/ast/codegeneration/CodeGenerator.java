@@ -216,4 +216,9 @@ public class CodeGenerator {
         out.println("or");
         out.flush();
     }
+
+    public void pop(char suffix) {
+        out.println("pop" + suffix);
+        out.flush();
+    }
 }

@@ -93,4 +93,9 @@ public class DoubleType extends AbstractType {
         }
         return false;
     }
+
+    @Override
+    public String toString(){
+        return "double";
+    }
 }

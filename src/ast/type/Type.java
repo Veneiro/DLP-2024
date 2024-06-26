@@ -35,4 +35,6 @@ public interface Type extends ASTNode {
     boolean promotesTo(Type returnType);
 
     boolean isLogical();
+
+    String toString();
 }

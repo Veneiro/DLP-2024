@@ -124,4 +124,9 @@ public class IntType extends AbstractType {
     public boolean isLogical(){
         return true;
     }
+
+    @Override
+    public String toString(){
+        return "int";
+    }
 }

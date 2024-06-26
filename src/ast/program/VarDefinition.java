@@ -20,6 +20,10 @@ public class VarDefinition extends AbstractDefinition {
         this.offset = offset;
     }
 
+    public String toString(){
+        return String.format("\t%s %s",this.getType(),this.getName());
+    }
+
     @Override
     public <TP, TR> TR accept(Visitor<TP,TR> visitor, TP param) {
         return visitor.visit(this, param);

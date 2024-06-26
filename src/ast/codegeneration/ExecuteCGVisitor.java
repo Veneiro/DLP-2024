@@ -100,8 +100,11 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
         }
 
         codeGenerator.label(funcDefinition.getName());
+        codeGenerator.param(((FunctionType) funcDefinition.getType()).definitions);
+        codeGenerator.locals(funcDefinition.statements);
         codeGenerator.enter(localSize);
         funcDefinition.statements.forEach(s -> s.accept(this, param));
+        codeGenerator.ret(returnSize, paramSize, localSize);
         return null;
     }
     /**
@@ -112,7 +115,7 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
      */
     @Override
     public TR visit(Program program, TP param) {
-        codeGenerator.source(source);
+        codeGenerator.source(source, program);
         codeGenerator.call("main");
         codeGenerator.halt();
         program.definitions.forEach(d -> d.accept(this,param));
@@ -203,7 +206,22 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
 
     @Override
     public TR visit(FuncInvocation funcInvocation, TP param) {
+        codeGenerator.line(funcInvocation.getLine());
+        funcInvocation.expressions.forEach(e -> e.accept(valueCGVisitor, param));
 
+        codeGenerator.call(funcInvocation.variable.name);
+
+        FunctionType type = (FunctionType) funcInvocation.variable.getType();
+        if (type.return_type != null) {
+            codeGenerator.pop(type.return_type.suffix());
+        }
+
+        return null;
+    }
+
+    @Override
+    public TR visit(FunctionInvocation funcInvocation, TP param) {
+        codeGenerator.line(funcInvocation.getLine());
         funcInvocation.expressions.forEach(e -> e.accept(valueCGVisitor, param));
 
         codeGenerator.call(funcInvocation.variable.name);

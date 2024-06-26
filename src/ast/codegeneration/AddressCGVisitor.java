@@ -3,8 +3,10 @@ package ast.codegeneration;
 import ast.expression.FieldAccess;
 import ast.expression.Indexing;
 import ast.expression.Variable;
+import ast.program.Field;
 import ast.type.ArrayType;
 import ast.type.IntType;
+import ast.type.StructType;
 import ast.visitor.AbstractVisitor;
 
 public class AddressCGVisitor<TP, TR> extends AbstractCGVisitor<TP,TR> {
@@ -67,7 +69,12 @@ public class AddressCGVisitor<TP, TR> extends AbstractCGVisitor<TP,TR> {
      */
      public TR visit(FieldAccess fieldAccess, TP param){
          fieldAccess.toAccess.accept(this, null);
-         codeGenerator.push(new IntType(0,0), fieldAccess.getType().numberOfBytes());
+
+         StructType type = (StructType) fieldAccess.toAccess.getType();
+         Field field = type.struct_fields.stream().filter(f -> f.getName().equals(fieldAccess.name)).findFirst().orElseThrow();
+
+
+         codeGenerator.push(new IntType(0,0), field.offset);
          codeGenerator.add(new IntType(0,0));
          return null;
      }

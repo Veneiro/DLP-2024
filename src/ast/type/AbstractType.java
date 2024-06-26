@@ -108,4 +108,9 @@ public abstract class AbstractType extends ASTAbstractNode implements Type {
     public boolean isLogical(){
         return false;
     }
+
+    @Override
+    public String toString(){
+        return "";
+    }
 }

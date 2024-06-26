@@ -44,6 +44,7 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
      * (P) VariableDefinition: definition -> type ID*
      */
     public TR visit(VarDefinition varDefinition, TP param) {
+        super.visit(varDefinition, param);
         if (varDefinition.getScope() == 0) { //Global
             varDefinition.setOffset(nObGlobal);
             nObGlobal += varDefinition.getType().numberOfBytes();
@@ -67,4 +68,6 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
         }
         return null;
     }
+
+
 }

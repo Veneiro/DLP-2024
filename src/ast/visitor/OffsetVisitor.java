@@ -41,6 +41,7 @@ public class OffsetVisitor<TP,TR> extends AbstractVisitor<TP,TR>{
     /**
      * &global = Σ( noB(type(prev globals not including itself)))
      * &local = BP - Σ( noB(type(prev locals including itself)))
+     * &param
      * (P) VariableDefinition: definition -> type ID*
      */
     public TR visit(VarDefinition varDefinition, TP param) {

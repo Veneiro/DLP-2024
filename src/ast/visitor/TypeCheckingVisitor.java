@@ -40,7 +40,9 @@ public class TypeCheckingVisitor<TP,TR> extends AbstractVisitor<TP,TR> {
      */
      @Override
      public TR visit(FunctionInvocation functionInvocation, TP param){
-         functionInvocation.expressions.forEach(expr -> expr.accept(this, null));
+         functionInvocation.expressions.forEach(expr ->
+                 expr.accept(this, null)
+         );
          functionInvocation.variable.accept(this, null);
          functionInvocation.variable.getType().parenthesis((functionInvocation.expressions.stream().map(args -> args.getType())).toList());
          return null;

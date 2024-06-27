@@ -207,7 +207,7 @@ public class ExecuteCGVisitor<TP,TR> extends AbstractVisitor<TP, TR> {
     @Override
     public TR visit(FuncInvocation funcInvocation, TP param) {
         codeGenerator.line(funcInvocation.getLine());
-        funcInvocation.expressions.forEach(e -> e.accept(valueCGVisitor, param));
+        funcInvocation.expressions.forEach(e -> e.accept(addressCGVisitor, param));
 
         codeGenerator.call(funcInvocation.variable.name);
 

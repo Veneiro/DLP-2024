@@ -39,6 +39,11 @@ public class AddressCGVisitor<TP, TR> extends AbstractCGVisitor<TP,TR> {
             codeGenerator.pushbp();
             codeGenerator.push(new IntType(0,0), variable.getDefinition().getOffset());
             codeGenerator.add(new IntType(0,0));
+            /*
+            if(variable.varDefinition.isParam()){
+              cg.ladd(new IntType(0,0));
+            }
+            */
         }
         return null;
     }
